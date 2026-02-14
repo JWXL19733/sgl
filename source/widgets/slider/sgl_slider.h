@@ -86,6 +86,18 @@ static inline void sgl_slider_set_track_color(sgl_obj_t *obj, sgl_color_t color)
 }
 
 /**
+ * @brief set the slider knob color
+ * @param obj slider object
+ * @param color knob color
+ */
+static inline void sgl_slider_set_knob_color(sgl_obj_t *obj, sgl_color_t color)
+{
+    sgl_slider_t *slider = (sgl_slider_t *)obj;
+    slider->knob_color = color;
+    sgl_obj_set_dirty(obj);
+}
+
+/**
  * @brief set the slider direction
  * @param obj slider object
  * @param direct slider direction
@@ -156,18 +168,6 @@ static inline uint8_t sgl_slider_get_value(sgl_obj_t *obj)
 static inline void sgl_slider_set_border_width(sgl_obj_t *obj, uint8_t width)
 {
     sgl_obj_set_border_width(obj, width);
-    sgl_obj_set_dirty(obj);
-}
-
-/**
- * @brief set the slider knob color
- * @param obj slider object
- * @param color knob color
- */
-static inline void sgl_slider_set_knob_color(sgl_obj_t *obj, sgl_color_t color)
-{
-    sgl_slider_t *slider = (sgl_slider_t *)obj;
-    slider->knob_color = color;
     sgl_obj_set_dirty(obj);
 }
 
