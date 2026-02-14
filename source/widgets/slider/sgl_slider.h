@@ -43,7 +43,7 @@
 typedef struct sgl_slider {
     sgl_obj_t          obj;
     sgl_color_t        track_color;
-    sgl_color_t        border_color;
+    sgl_color_t        knob_color;
     sgl_color_t        fill_color;
     /* 0: horizontal, 1: vertical */
     uint8_t            direct : 1;
@@ -160,14 +160,14 @@ static inline void sgl_slider_set_border_width(sgl_obj_t *obj, uint8_t width)
 }
 
 /**
- * @brief set the slider border color
+ * @brief set the slider knob color
  * @param obj slider object
- * @param color border color
+ * @param color knob color
  */
-static inline void sgl_slider_set_border_color(sgl_obj_t *obj, sgl_color_t color)
+static inline void sgl_slider_set_knob_color(sgl_obj_t *obj, sgl_color_t color)
 {
     sgl_slider_t *slider = (sgl_slider_t *)obj;
-    slider->border_color = color;
+    slider->knob_color = color;
     sgl_obj_set_dirty(obj);
 }
 
