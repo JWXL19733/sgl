@@ -67,16 +67,16 @@ static void sgl_win_construct_cb(sgl_surf_t *surf, sgl_obj_t* obj, sgl_event_t *
         sgl_label_set_text(title_text, win->title_text);
         sgl_label_set_font(title_text, win->title_font);
         sgl_label_set_text_color(title_text, win->title_text_color);
-        sgl_label_set_text_align(title_text, SGL_ALIGN_LEFT_MID);
+        sgl_label_set_text_align(title_text, win->title_align);
         sgl_label_set_text_offset(title_text, obj->radius, 0);
 
         sgl_obj_set_size(exit, exit_r, exit_r);
         sgl_obj_set_pos(exit, exit_cx, exit_cy);
-        sgl_circle_set_radius(win->exit, exit_r);
-        sgl_circle_set_color(win->exit, SGL_COLOR_RED);
-        sgl_circle_set_border_width(win->exit, 0);
-        sgl_circle_set_alpha(win->exit, win->bg.alpha);
-        sgl_obj_set_event_cb(win->exit, win_exit_cb, (size_t)win);
+        sgl_circle_set_radius(exit, exit_r);
+        sgl_circle_set_color(exit, SGL_COLOR_RED);
+        sgl_circle_set_border_width(exit, 0);
+        sgl_circle_set_alpha(exit, win->bg.alpha);
+        sgl_obj_set_event_cb(exit, win_exit_cb, (size_t)win);
     }
     else if (evt->type == SGL_EVENT_DESTROYED) {
         sgl_obj_set_destroyed(win->body);
@@ -110,6 +110,7 @@ sgl_obj_t* sgl_win_create(sgl_obj_t* parent)
     win->bg.border = 0;
     win->bg.border_color = SGL_THEME_BORDER_COLOR;
     win->title_font = sgl_get_system_font();
+    win->title_align = SGL_ALIGN_LEFT_MID;
 
     sgl_obj_t *body = sgl_rect_create(obj->parent);
     if (body == NULL) {

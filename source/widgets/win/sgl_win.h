@@ -45,7 +45,8 @@ typedef struct sgl_win {
     sgl_draw_rect_t bg;
     const char      *title_text;
     const sgl_font_t *title_font;
-    uint16_t        title_h;
+    uint8_t         title_h;
+    uint8_t         title_align;
     sgl_color_t     title_bg_color;
     sgl_color_t     title_text_color;
 }sgl_win_t;
@@ -159,6 +160,7 @@ static inline void sgl_win_set_title_font(sgl_obj_t *obj, const sgl_font_t *font
 {
     sgl_win_t *win = sgl_container_of(obj, sgl_win_t, obj);
     win->title_font = font;
+    win->title_h = sgl_max(sgl_font_get_height(font), win->title_h);
     sgl_obj_set_dirty(obj);
 }
 
@@ -171,6 +173,18 @@ static inline void sgl_win_set_title_height(sgl_obj_t *obj, uint16_t height)
 {
     sgl_win_t *win = sgl_container_of(obj, sgl_win_t, obj);
     win->title_h = height;
+    sgl_obj_set_dirty(obj);
+}
+
+/**
+ * @brief set window title text align
+ * @param obj window object
+ * @param align text align
+ */
+static inline void sgl_win_set_title_text_align(sgl_obj_t *obj, uint8_t align)
+{
+    sgl_win_t *win = sgl_container_of(obj, sgl_win_t, obj);
+    win->title_align = align;
     sgl_obj_set_dirty(obj);
 }
 
