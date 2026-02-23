@@ -186,16 +186,4 @@ static inline void sgl_win_set_title_bg_color(sgl_obj_t *obj, sgl_color_t color)
     sgl_obj_set_dirty(obj);
 }
 
-/**
- * @brief destroy window object
- * @param obj window object
- * @return none
- */
-static inline void sgl_win_destroy(sgl_obj_t *obj)
-{
-    sgl_win_t *win = sgl_container_of(obj, sgl_win_t, obj);
-    sgl_obj_set_destroyed(win->body);
-    sgl_obj_set_destroyed(obj);
-}
-
 #endif // !__SGL_LED_H__

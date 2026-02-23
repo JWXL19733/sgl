@@ -78,6 +78,9 @@ static void sgl_win_construct_cb(sgl_surf_t *surf, sgl_obj_t* obj, sgl_event_t *
         sgl_circle_set_alpha(win->exit, win->bg.alpha);
         sgl_obj_set_event_cb(win->exit, win_exit_cb, (size_t)win);
     }
+    else if (evt->type == SGL_EVENT_DESTROYED) {
+        sgl_obj_set_destroyed(win->body);
+    }
 }
 
 /**

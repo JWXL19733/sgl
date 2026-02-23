@@ -1421,6 +1421,14 @@ static inline void sgl_dirty_area_calculate(sgl_obj_t *obj)
             /* merge destroy area */
             sgl_dirty_area_push(&obj->area);
 
+            sgl_event_t evt = {
+                .type = SGL_EVENT_DESTROYED,
+            };
+
+            /* check construct function */
+            SGL_ASSERT(obj->construct_fn != NULL);
+            obj->construct_fn(NULL, obj, &evt);
+
             /* remove obj from parent */
             sgl_obj_remove(obj);
 
