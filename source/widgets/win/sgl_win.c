@@ -82,7 +82,7 @@ static void sgl_win_construct_cb(sgl_surf_t *surf, sgl_obj_t* obj, sgl_event_t *
         sgl_obj_set_size(exit, exit_r, exit_r);
         sgl_obj_set_pos(exit, exit_cx, exit_cy);
         sgl_circle_set_radius(exit, exit_r);
-        sgl_circle_set_color(exit, SGL_COLOR_RED);
+        sgl_circle_set_color(exit, sgl_rgb(255, 90, 80));
         sgl_circle_set_border_width(exit, 0);
         sgl_circle_set_alpha(exit, win->bg.alpha);
         sgl_obj_set_event_cb(exit, win_exit_cb, (size_t)win);
