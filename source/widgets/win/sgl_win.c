@@ -51,10 +51,11 @@ static void sgl_win_construct_cb(sgl_surf_t *surf, sgl_obj_t* obj, sgl_event_t *
     }
     else if (evt->type == SGL_EVENT_DRAW_INIT) {
         win->title_h = sgl_max(win->title_h, sgl_font_get_height(win->title_font) + obj->border);
-        exit_r  = win->title_h / 2;
-        exit_cx = sgl_obj_get_width(obj) - exit_r - exit_r / 2;
-        exit_cy = win->title_h / 2 - exit_r / 2 - 1;
-    
+        SGL_LOG_INFO("sgl_win_construct_cb: win->title_h = %d", win->title_h);
+        exit_r  = win->title_h * 6 / 8;
+        exit_cx = sgl_obj_get_width(obj) - exit_r - obj->radius / 2;
+        exit_cy = (win->title_h - exit_r + 1) / 2;
+
         sgl_obj_set_size(body, sgl_obj_get_width(obj), win->title_h + obj->border + obj->radius);
         sgl_obj_set_pos(body, obj->coords.x1, obj->coords.y1 - win->title_h + obj->border);
         sgl_rect_set_border_width(body, obj->border);
