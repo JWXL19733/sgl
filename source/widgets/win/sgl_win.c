@@ -22,55 +22,50 @@
  * SOFTWARE.
  */
 
+#include <sgl_theme.h>
 #include "sgl_win.h"
-
-static void win_close_cb(sgl_event_t *evt)
-{
-    sgl_win_t *win = (sgl_win_t *)evt->param;
-    if (evt->type == SGL_EVENT_RELEASED) {
-        sgl_obj_set_destroyed(win->body);
-        sgl_obj_set_destroyed(&win->obj);
-    }
-}
 
 static void sgl_win_construct_cb(sgl_surf_t *surf, sgl_obj_t* obj, sgl_event_t *evt)
 {
     sgl_win_t *win = sgl_container_of(obj, sgl_win_t, obj);
     sgl_rect_t bg = obj->coords;
-    sgl_obj_t *body = win->body;
-    sgl_obj_t *close = win->close;
-    sgl_label_t *title_text = (sgl_label_t *)win->title;
-    int16_t close_cx, close_cy, close_r;
+    sgl_rect_t title_bg = obj->coords;
+    sgl_pos_t align_pos;
+    int16_t close_cx, close_cy, close_r, title_h;
 
-    win->title_h = sgl_max(obj->radius, win->title_h);
-    bg.y1 -= win->title_h;
+    title_h = sgl_max3(obj->radius, win->title_h, sgl_font_get_height(win->title_font));
+    bg.y1 -= title_h;
+    title_bg.y1 = bg.y1;
+    title_bg.y2 = title_bg.y1 + title_h;
+    close_r  = title_h / 3;
+    close_cx = obj->coords.x2 - close_r - obj->radius / 2;
+    close_cy = title_bg.y1 + title_h / 2 + obj->border / 2;
 
     if (evt->type == SGL_EVENT_DRAW_MAIN) {
-        sgl_area_selfclip(&body->area, &bg);
+        if (obj->area.y1 == obj->coords.y1) {
+            obj->area.y1 -= title_h;
+        }
+
         sgl_draw_rect(surf, &obj->area, &bg, &win->bg);
-        /* FIXME: body should be movable */
-        //sgl_obj_set_pos(body, obj->coords.x1, obj->coords.y1 - win->title_h + obj->border);
-        //sgl_obj_clear_all_dirty(body);
+        sgl_draw_fill_rect_with_border(surf, &title_bg, &bg, obj->radius, win->title_bg_color, 
+                                             win->bg.border_color, win->bg.border, win->bg.alpha
+                                      );
+        
+        align_pos = sgl_get_text_pos(&title_bg, win->title_font, win->title_text, 0, (sgl_align_type_t)win->title_align);
+        if (win->title_align == SGL_ALIGN_LEFT_MID) {
+            align_pos.x += obj->radius;
+        }
+        sgl_draw_string(surf, &obj->area, align_pos.x, align_pos.y + obj->border, win->title_text, 
+                          win->title_text_color, win->bg.alpha, win->title_font
+                        );
+        
+        sgl_draw_fill_circle(surf, &title_bg, close_cx, close_cy, close_r, win->close_color, win->bg.alpha);
     }
-    else if (evt->type == SGL_EVENT_DRAW_INIT) {
-        win->title_h = sgl_max(win->title_h, sgl_font_get_height(title_text->font) + obj->border);
-        close_r  = win->title_h * 6 / 8 - obj->border;
-        close_cx = sgl_obj_get_width(obj) - close_r - obj->radius / 2;
-        close_cy = (win->title_h - close_r + 1) / 2;
-
-        sgl_obj_set_size(body, sgl_obj_get_width(obj), win->title_h + obj->border + obj->radius);
-        sgl_obj_set_pos(body, obj->coords.x1, obj->coords.y1 - win->title_h + obj->border);
-
-        sgl_obj_set_size(&title_text->obj, sgl_obj_get_width(obj) - win->title_h, win->title_h);
-        sgl_obj_set_pos(&title_text->obj, 0, 0);
-
-        sgl_obj_set_size(close, close_r, close_r);
-        sgl_obj_set_pos(close, close_cx, close_cy);
-        sgl_circle_set_radius(close, close_r);
-        sgl_circle_set_alpha(close, win->bg.alpha);
-    }
-    else if (evt->type == SGL_EVENT_DESTROYED) {
-        sgl_obj_set_destroyed(win->body);
+    if (evt->type == SGL_EVENT_PRESSED || evt->type == SGL_EVENT_CLICKED) {
+        if (evt->pos.x >= (close_cx - close_r) && evt->pos.x <= (close_cx + close_r) 
+             && evt->pos.y >= (close_cy - close_r) && evt->pos.y <= (close_cy + close_r)) {
+            sgl_obj_set_destroyed(obj);
+        }
     }
 }
 
@@ -93,7 +88,7 @@ sgl_obj_t* sgl_win_create(sgl_obj_t* parent)
     sgl_obj_t *obj = &win->obj;
     sgl_obj_init(&win->obj, parent);
     obj->construct_fn = sgl_win_construct_cb;
-    obj->needinit = 1;
+    sgl_obj_set_clickable(obj);
 
     win->bg.alpha = SGL_THEME_ALPHA;
     win->bg.color = SGL_THEME_COLOR;
@@ -101,36 +96,9 @@ sgl_obj_t* sgl_win_create(sgl_obj_t* parent)
     win->bg.border = 0;
     win->bg.border_color = SGL_THEME_BORDER_COLOR;
 
-    sgl_obj_t *body = sgl_rect_create(obj->parent);
-    if (body == NULL) {
-        SGL_LOG_ERROR("sgl_win_create: sgl_rect_create failed");
-        goto free_obj;
-    }
-    sgl_obj_t *title_text = sgl_label_create(body);
-    if (title_text == NULL) {
-        SGL_LOG_ERROR("sgl_win_create: sgl_label_create failed");
-        goto free_body;
-    }
-    sgl_obj_t *close = sgl_circle_create(body);
-    if (close == NULL) {
-        SGL_LOG_ERROR("sgl_win_create: sgl_circle_create failed");
-        goto free_title;
-    }
-    sgl_circle_set_border_width(close, 0);
-    sgl_obj_set_event_cb(close, win_close_cb, win);
-    sgl_circle_set_color(close, sgl_rgb(255, 90, 80));
-
-    win->body = body;
-    win->title = title_text;
-    win->close = close;
-    sgl_obj_move_down(body);
+    win->title_align = SGL_ALIGN_LEFT_MID;
+    win->title_bg_color = SGL_THEME_COLOR;
+    win->title_font = sgl_get_system_font();
+    win->close_color = sgl_rgb(255, 90, 80);
     return obj;
-
-free_title:
-    sgl_obj_delete(title_text);
-free_body:
-    sgl_obj_delete(body);
-free_obj:
-    sgl_obj_delete(obj);
-    return NULL;
 }

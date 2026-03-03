@@ -25,7 +25,13 @@
 #ifndef __SGL_WIN_H__
 #define __SGL_WIN_H__
 
-#include <sgl.h>
+#include <sgl_core.h>
+#include <sgl_draw.h>
+#include <sgl_math.h>
+#include <sgl_log.h>
+#include <sgl_mm.h>
+#include <sgl_cfgfix.h>
+#include <string.h>
 
 /**
  * @brief sgl window struct
@@ -33,11 +39,14 @@
  */
 typedef struct sgl_win {
     sgl_obj_t       obj;
-    sgl_obj_t       *body;
-    sgl_obj_t       *title;
-    sgl_obj_t       *close;
+    const char     *title_text;
+    const sgl_font_t *title_font;
+    sgl_color_t     title_bg_color;
+    sgl_color_t     title_text_color;
     sgl_draw_rect_t bg;
     uint8_t         title_h;
+    uint8_t         title_align;
+    sgl_color_t     close_color;
 }sgl_win_t;
 
 /**
@@ -62,11 +71,9 @@ static inline void sgl_win_set_color(sgl_obj_t *obj, sgl_color_t color)
 static inline void sgl_win_set_radius(sgl_obj_t *obj, uint8_t radius)
 {
     sgl_win_t *win = sgl_container_of(obj, sgl_win_t, obj);
-    sgl_obj_t *rect = win->body;
     win->bg.radius = radius;
     sgl_obj_set_radius(obj, radius);
     sgl_obj_set_dirty(obj);
-    sgl_rect_set_radius(rect, radius);
 }
 
 /**
@@ -77,10 +84,8 @@ static inline void sgl_win_set_radius(sgl_obj_t *obj, uint8_t radius)
 static inline void sgl_win_set_alpha(sgl_obj_t *obj, uint8_t alpha)
 {
     sgl_win_t *win = sgl_container_of(obj, sgl_win_t, obj);
-    sgl_obj_t *rect = win->body;
     win->bg.alpha = alpha;
     sgl_obj_set_dirty(obj);
-    sgl_rect_set_alpha(rect, alpha);
 }
 
 /**
@@ -91,11 +96,9 @@ static inline void sgl_win_set_alpha(sgl_obj_t *obj, uint8_t alpha)
 static inline void sgl_win_set_border_width(sgl_obj_t *obj, uint8_t width)
 {
     sgl_win_t *win = sgl_container_of(obj, sgl_win_t, obj);
-    sgl_obj_t *rect = win->body;
     win->bg.border = width;
     sgl_obj_set_border_width(obj, width);
     sgl_obj_set_dirty(obj);
-    sgl_rect_set_border_width(rect, width);
 }
 
 /**
@@ -106,10 +109,8 @@ static inline void sgl_win_set_border_width(sgl_obj_t *obj, uint8_t width)
 static inline void sgl_win_set_border_color(sgl_obj_t *obj, sgl_color_t color)
 {
     sgl_win_t *win = sgl_container_of(obj, sgl_win_t, obj);
-    sgl_obj_t *rect = win->body;
     win->bg.border_color = color;
     sgl_obj_set_dirty(obj);
-    sgl_rect_set_border_color(rect, color);
 }
 
 /**
@@ -132,7 +133,8 @@ static inline void sgl_win_set_pixmap(sgl_obj_t *obj, const sgl_pixmap_t *pixmap
 static inline void sgl_win_set_title_text(sgl_obj_t *obj, const char *text)
 {
     sgl_win_t *win = sgl_container_of(obj, sgl_win_t, obj);
-    sgl_label_set_text(win->title, text);
+    win->title_text = text;
+    sgl_obj_set_dirty(obj);
 }
 
 /**
@@ -143,7 +145,8 @@ static inline void sgl_win_set_title_text(sgl_obj_t *obj, const char *text)
 static inline void sgl_win_set_title_text_color(sgl_obj_t *obj, sgl_color_t color)
 {
     sgl_win_t *win = sgl_container_of(obj, sgl_win_t, obj);
-    sgl_label_set_text_color(win->title, color);
+    win->title_text_color = color;
+    sgl_obj_set_dirty(obj);
 }
 
 /**
@@ -154,7 +157,8 @@ static inline void sgl_win_set_title_text_color(sgl_obj_t *obj, sgl_color_t colo
 static inline void sgl_win_set_title_font(sgl_obj_t *obj, const sgl_font_t *font)
 {
     sgl_win_t *win = sgl_container_of(obj, sgl_win_t, obj);
-    sgl_label_set_font(win->title, font);
+    win->title_font = font;
+    sgl_obj_set_dirty(obj);
 }
 
 /**
@@ -166,6 +170,7 @@ static inline void sgl_win_set_title_height(sgl_obj_t *obj, uint16_t height)
 {
     sgl_win_t *win = sgl_container_of(obj, sgl_win_t, obj);
     win->title_h = height;
+    sgl_obj_set_dirty(obj);
 }
 
 /**
@@ -176,7 +181,8 @@ static inline void sgl_win_set_title_height(sgl_obj_t *obj, uint16_t height)
 static inline void sgl_win_set_title_text_align(sgl_obj_t *obj, uint8_t align)
 {
     sgl_win_t *win = sgl_container_of(obj, sgl_win_t, obj);
-    sgl_label_set_text_align(win->title, align);
+    win->title_align = align;
+    sgl_obj_set_dirty(obj);
 }
 
 /**
@@ -187,7 +193,8 @@ static inline void sgl_win_set_title_text_align(sgl_obj_t *obj, uint8_t align)
 static inline void sgl_win_set_title_bg_color(sgl_obj_t *obj, sgl_color_t color)
 {
     sgl_win_t *win = sgl_container_of(obj, sgl_win_t, obj);
-    sgl_rect_set_color(win->body, color);
+    win->title_bg_color = color;
+    sgl_obj_set_dirty(obj);
 }
 
 #endif // !__SGL_LED_H__

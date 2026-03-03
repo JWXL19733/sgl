@@ -59,7 +59,6 @@ void sgl_anim_init(sgl_anim_t *anim)
 
     anim->finish_cb = NULL;
     anim->auto_free = 0;
-    anim->finished = 0;
 }
 
 
@@ -98,6 +97,7 @@ void sgl_anim_add(sgl_anim_t *anim)
     }
 
     anim->next = NULL;
+    anim->finished = 0;
     anim_ctx.anim_cnt++;
 }
 
