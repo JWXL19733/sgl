@@ -188,8 +188,8 @@ static void scope_construct_cb(sgl_surf_t *surf, sgl_obj_t* obj, sgl_event_t *ev
 
     if(evt->type == SGL_EVENT_DRAW_MAIN) {
         // Skip drawing if object is completely outside screen bounds
-        if (obj->area.x2 < surf->x1 || obj->area.x1 >= surf->x2 ||
-            obj->area.y2 < surf->y1 || obj->area.y1 >= surf->y2) {
+        if (obj->area.x2 < surf->x1 || obj->area.x1 > surf->x2 ||
+            obj->area.y2 < surf->y1 || obj->area.y1 > surf->y2) {
             return; // Object is fully off-screen; no need to draw
         }
 
