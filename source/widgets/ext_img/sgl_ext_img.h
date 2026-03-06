@@ -107,6 +107,8 @@
  *          sgl_ext_img_set_read_ops(ext_img, flash_port_read_data_from_flash);
  */
 
+ /* TODO: add ext img buffer size config */
+#define SGL_EXT_IMG_BUFFER_SIZE   (CONFIG_SGL_EXT_IMG_BUFFER)
 
 /**
  * @brief sgl ext_img struct
@@ -126,10 +128,10 @@ typedef struct sgl_ext_img {
     uint8_t         remainder;
     uint8_t         pix_alpha;
     uint32_t        index;
-#if CONFIG_SGL_EXT_IMG_USE_BUFFER
-    uint8_t         flash_buffer[512];
+#if CONFIG_SGL_EXT_IMG_BUFFER
+    uint8_t         flash_buffer[SGL_EXT_IMG_BUFFER_SIZE];
 #endif
-}sgl_ext_img_t;
+} sgl_ext_img_t;
 
 /**
  * @brief create an ext_img object
