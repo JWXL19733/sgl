@@ -46,7 +46,6 @@ void sgl_anim_init(sgl_anim_t *anim)
 {
     anim->next = NULL;
     anim->data = NULL;
-    anim->act_delay = 0;
     anim->act_duration = 0;
     anim->start_value = 0;
     anim->end_value = 0;
@@ -83,7 +82,7 @@ sgl_anim_t* sgl_anim_create(void)
  * @param  anim animation object
  * @return none
 */
-void sgl_anim_add(sgl_anim_t *anim)
+static void sgl_anim_add(sgl_anim_t *anim)
 {
     if (sgl_anim_ctx.anim_list_tail != NULL) {
         sgl_anim_ctx.anim_list_tail->next = anim;
@@ -104,7 +103,7 @@ void sgl_anim_add(sgl_anim_t *anim)
  * @param  anim animation object
  * @return none
 */
-void sgl_anim_remove(sgl_anim_t *anim)
+static void sgl_anim_remove(sgl_anim_t *anim)
 {
     SGL_ASSERT(anim != NULL);
     sgl_anim_t *prev = NULL;
@@ -134,6 +133,53 @@ void sgl_anim_remove(sgl_anim_t *anim)
 
 
 /**
+ * @brief start animation
+ * @param  anim animation object
+ * @para  repeat_cnt repeat count of animation
+ * @return none
+*/
+void sgl_anim_start(sgl_anim_t *anim, uint32_t repeat_cnt)
+{
+    SGL_ASSERT(anim != NULL);
+    if (anim->finished && repeat_cnt) {
+        sgl_anim_add(anim);
+        anim->finished = 0;
+    }
+    anim->repeat_cnt = repeat_cnt & SGL_ANIM_REPEAT_LOOP;
+}
+
+
+/**
+ * @brief stop animation
+ * @param  anim animation object
+ * @return none
+*/
+void sgl_anim_stop(sgl_anim_t *anim)
+{
+    SGL_ASSERT(anim != NULL);
+    if (!anim->finished) {
+        sgl_anim_remove(anim);
+        anim->finished = 1;
+    }
+}
+
+
+/**
+ * @brief delete animation object
+ * @param anim animation object
+ * @return none
+*/
+void sgl_anim_delete(sgl_anim_t *anim)
+{
+    SGL_ASSERT(anim != NULL);
+    if (!anim->finished) {
+        sgl_anim_stop(anim);
+    } 
+    sgl_free(anim);
+}
+
+
+/**
  * @brief animation task, it will foreach all animation
  * @param  none
  * @return none
@@ -142,17 +188,17 @@ void sgl_anim_remove(sgl_anim_t *anim)
 void sgl_anim_task(void)
 {
     int32_t value = 0;
-    uint32_t elaps_time = 0;
+    uint32_t elaps_time = 0, act_time = 0;
     sgl_anim_t *anim = sgl_anim_ctx.anim_list_head, *next = NULL;
 
     while (anim != NULL) {
-        anim->act_time += sgl_tick_get();
+        act_time = sgl_tick_get();
 
-        if(anim->act_time < anim->act_delay) {
+        if(act_time < anim->act_delay) {
             continue;
         }
 
-        elaps_time = anim->act_time - anim->act_delay;
+        elaps_time = act_time - anim->act_delay;
 
         /* check callback function for debug */
         SGL_ASSERT(anim->path_cb != NULL);
@@ -169,9 +215,6 @@ void sgl_anim_task(void)
                 anim->finish_cb(anim);
             }
 
-            /* reset anim active time */
-            anim->act_time = 0;
-
             /* remove anim object if repeat count is 0 */
             if (anim->repeat_cnt == 0) {
                 sgl_anim_stop(anim);
@@ -184,6 +227,8 @@ void sgl_anim_task(void)
                     continue;
                 }
             }
+
+            anim->act_delay += anim->act_duration;
         }
 
         anim = anim->next;
