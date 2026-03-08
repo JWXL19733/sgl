@@ -572,6 +572,7 @@ static sgl_page_t* sgl_page_create(void)
     }
 
     page->color = SGL_THEME_DESKTOP;
+    page->alpha = SGL_ALPHA_MAX;
 
     obj->parent = obj;
     obj->clickable = 0;

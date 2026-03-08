@@ -54,7 +54,6 @@ void sgl_anim_init(sgl_anim_t *anim)
 
     anim->path_cb = NULL;
     anim->path_algo = NULL;
-    anim->repeat_cnt = 1;
 
     anim->finish_cb = NULL;
     anim->auto_free = 0;
@@ -185,7 +184,6 @@ void sgl_anim_task(void)
 
             /* remove anim object if repeat count is 0 */
             if (anim->repeat_cnt == 0) {
-                anim->finished = 1;
                 sgl_anim_stop(anim);
 
                 /* if animation is auto free, free it */
