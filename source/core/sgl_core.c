@@ -1596,6 +1596,9 @@ static inline void sgl_draw_task(sgl_fbdev_t *fbdev)
  */
 void sgl_task_handle_sync(void)
 {
+    /* sync tick */
+    sgl_tick_sync();
+
     /* event task */
     sgl_event_task();
 

@@ -1722,7 +1722,6 @@ static inline void sgl_task_handle(void)
         return;
     }
 
-    sgl_tick_sync();
     /* If the system tick time has been reached, execute the task. */
     sgl_task_handle_sync();
 }
