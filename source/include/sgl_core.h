@@ -763,7 +763,7 @@ static inline void sgl_log_stdout(const char *str)
  * @param pixmap pointer to pixmap
  * @return pixmap bytes of per pixel
  */
-uint8_t sgl_pixmal_get_bytes_per_pixel(const sgl_pixmap_t *pixmap);
+uint8_t sgl_pixmal_get_pixel_bytes(const sgl_pixmap_t *pixmap);
 
 
 /**
@@ -1681,17 +1681,6 @@ void sgl_screen_load(sgl_obj_t *obj);
 static inline sgl_obj_t* sgl_screen_act(void)
 {
     return sgl_system.fbdev.active;
-}
-
-
-/**
- * @brief get active page
- * @param none
- * @return page: active page
- */
-static inline sgl_page_t* sgl_page_get_active(void)
-{
-    return (sgl_page_t*)sgl_system.fbdev.active;
 }
 
 

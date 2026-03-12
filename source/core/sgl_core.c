@@ -102,7 +102,7 @@ int sgl_fbdev_register(sgl_fbinfo_t *fbinfo)
  * @param pixmap pointer to pixmap
  * @return pixmap bytes of per pixel
  */
-uint8_t sgl_pixmal_get_bytes_per_pixel(const sgl_pixmap_t *pixmap)
+uint8_t sgl_pixmal_get_pixel_bytes(const sgl_pixmap_t *pixmap)
 {
     static const uint8_t s_bytes_per_pixel[] = {
         [SGL_PIXMAP_FMT_NONE]         = sizeof(sgl_color_t),
