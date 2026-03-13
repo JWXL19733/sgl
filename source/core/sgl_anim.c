@@ -195,7 +195,7 @@ void sgl_anim_task(void)
     uint32_t elaps_time = 0, act_time = 0;
     sgl_anim_t *anim = sgl_anim_ctx.anim_list_head, *next = NULL;
 
-    while (anim != NULL) {
+    for (; anim != NULL; anim = anim->next) {
         act_time = sgl_tick_get();
 
         if(act_time < anim->act_delay) {
@@ -234,8 +234,6 @@ void sgl_anim_task(void)
 
             anim->act_delay += anim->act_duration;
         }
-
-        anim = anim->next;
     }
 }
 

@@ -150,6 +150,7 @@ static inline void sgl_ext_img_set_pixmap(sgl_obj_t *obj, const sgl_pixmap_t *pi
 {
     SGL_ASSERT(obj != NULL);
     ((sgl_ext_img_t*)obj)->pixmap = pixmap;
+    sgl_obj_set_dirty(obj);
 }
 
 /**
@@ -191,6 +192,7 @@ static inline void sgl_ext_img_set_pixmap_num(sgl_obj_t *obj, uint8_t num, bool 
     SGL_ASSERT(obj != NULL);
     ((sgl_ext_img_t*)obj)->pixmap_num = num;
     ((sgl_ext_img_t*)obj)->pixmap_auto = (uint8_t)auto_refresh;
+    sgl_obj_set_dirty(obj);
 }
 
 /**
