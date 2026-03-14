@@ -2165,7 +2165,7 @@ int sgl_vsnprintf(char *buf, size_t size, const char *fmt, va_list ap);
 int sgl_snprintf(char *buf, size_t size, const char *fmt, ...);
 
 
-#if (CONFIG_SGL_OBJ_USE_NAME)
+#if (CONFIG_SGL_OBJ_USE_NAME && CONFIG_SGL_DEBUG)
 /**
  * @brief set object name
  * @param obj The object to set the name

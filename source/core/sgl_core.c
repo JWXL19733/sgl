@@ -1528,15 +1528,13 @@ static inline void draw_obj_slice(sgl_obj_t *obj, sgl_surf_t *surf)
             continue;
         }
 
-		if (sgl_surf_area_is_overlap(surf, &obj->area)) {
-			evt.type = SGL_EVENT_DRAW_MAIN;
-			SGL_ASSERT(obj->construct_fn != NULL);
-			obj->construct_fn(surf, obj, &evt);
+        evt.type = SGL_EVENT_DRAW_MAIN;
+        SGL_ASSERT(obj->construct_fn != NULL);
+        obj->construct_fn(surf, obj, &evt);
 
-            if (obj->child != NULL) {
-                stack[top++] = obj->child;
-            }
-		}
+        if (obj->child != NULL) {
+            stack[top++] = obj->child;
+        }
 	}
 
     /* flush dirty area into screen */
