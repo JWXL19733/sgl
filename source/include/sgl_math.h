@@ -59,10 +59,11 @@ extern "C" {
 
 #define sgl_mid(a, b)                     (((a) + (b)) / 2)
 
-#define SGL_FIXED_SHIFT                   (10)
+#define SGL_FIXED_SHIFT                   (15)
 #define SGL_FIXED_ONE                     (1 << SGL_FIXED_SHIFT)
 #define SGL_FIXED_MASK                    (SGL_FIXED_ONE - 1)
 
+#define SGL_SIN_SHIFT                     (15)
 #define SGL_SIN_FIXED_ONE                 (32768)
 #define SGL_COS_FIXED_ONE                 (32768)
 

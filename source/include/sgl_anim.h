@@ -61,6 +61,8 @@ typedef int32_t (*sgl_anim_path_algo_t)(uint32_t elaps, uint32_t duration, int32
  * @next:      Pointer to the next animation in a singly-linked list.
  *             Used internally by the animation scheduler to chain active animations.
  * 
+ * @act_time:  Current time (in ms) of the animation.
+ * 
  * @act_delay: Delay time (in ms) before the animation starts after being added to the system.
  *             The animation will not progress until this delay has elapsed.
  * 
@@ -97,6 +99,7 @@ typedef struct sgl_anim {
     uint32_t              act_time;
     uint32_t              act_delay;
     uint32_t              act_duration;
+    int32_t               last_value;
     int32_t               start_value;
     int32_t               end_value;
     sgl_anim_path_cb_t    path_cb;

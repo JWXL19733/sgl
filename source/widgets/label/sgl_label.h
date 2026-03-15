@@ -33,7 +33,7 @@
 #include <sgl_cfgfix.h>
 #include <string.h>
 
-#define SGL_LABEL_FMT_LEN_MAX (CONFIG_SGL_LABEL_FMT_LEN_MAX)
+#define SGL_LABEL_FMT_LEN_MAX   (CONFIG_SGL_LABEL_FMT_LEN_MAX)
 
 /**
  * @brief sgl label object
@@ -53,10 +53,14 @@ typedef struct sgl_label {
         } offset;
         int16_t rotation;
     } transform;
-    char             *text;
     const sgl_font_t *font;
     sgl_color_t      color;
     sgl_color_t      bg_color;
+#if (SGL_LABEL_FMT_LEN_MAX)
+    char            text[SGL_LABEL_FMT_LEN_MAX];
+#else 
+    const char      *text;
+#endif
 } sgl_label_t;
 
 
@@ -67,19 +71,30 @@ typedef struct sgl_label {
  */
 sgl_obj_t* sgl_label_create(sgl_obj_t* parent);
 
-
+#if (SGL_LABEL_FMT_LEN_MAX)
+/**
+ * @brief set the text of the label
+ * @param obj pointer to the label object
+ * @param fmt format string
+ * @return none
+ * @warning If you use this function, please make sure the string is less than CONFIG_SGL_LABEL_FMT_LEN_MAX
+ *          the CONFIG_SGL_LABEL_FMT_LEN_MAX is 16 by default.
+ */
+void sgl_label_set_text(sgl_obj_t* obj, const char *fmt, ...);
+#else
 /**
  * @brief set label text
  * @param obj pointer to the label object
  * @param text text to be set
  * @return none
  */
-static inline void sgl_label_set_text(sgl_obj_t *obj, char *text)
+static inline void sgl_label_set_text(sgl_obj_t *obj, const char *text)
 {
     sgl_label_t *label = sgl_container_of(obj, sgl_label_t, obj);
     label->text = text;
     sgl_obj_set_dirty(obj);
 }
+#endif // SGL_LABEL_FMT_LEN_MAX
 
 /**
  * @brief set label font
@@ -188,18 +203,6 @@ static inline void sgl_label_set_text_rotation(sgl_obj_t *obj, int16_t text_rota
     label->rota = label->transform.rotation ? 1 : 0;
     sgl_obj_set_dirty(obj);
 }
-
-
-/**
- * @brief set the text of the label
- * @param obj pointer to the label object
- * @param fmt format string
- * @return none
- * @warning If you use this function, please make sure the string is less than CONFIG_SGL_LABEL_FMT_LEN_MAX
- *          the CONFIG_SGL_LABEL_FMT_LEN_MAX is 16 by default.
- *          And if you used this function, please always use sgl_label_set_text_fmt() instead of sgl_label_set_text().
- */
-void sgl_label_set_text_fmt(sgl_obj_t* obj, const char *fmt, ...);
 
 
 #endif // !__SGL_LABEL_H__

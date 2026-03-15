@@ -148,6 +148,7 @@ void sgl_anim_start(sgl_anim_t *anim, uint32_t repeat_cnt)
     }
     anim->act_time = sgl_tick_get() + anim->act_delay;
     anim->repeat_cnt = repeat_cnt & SGL_ANIM_REPEAT_LOOP;
+    anim->last_value = anim->start_value;
 }
 
 
@@ -204,7 +205,9 @@ void sgl_anim_task(void)
         SGL_ASSERT(anim->path_cb != NULL);
         SGL_ASSERT(anim->path_algo != NULL);
         value = anim->path_algo(sgl_min(elaps_time, anim->act_duration), anim->act_duration, anim->start_value, anim->end_value);
-        anim->path_cb(anim, value);
+        if (value != anim->last_value) {
+            anim->path_cb(anim, value);
+        }
 
         if (elaps_time > anim->act_duration) {
             if (anim->repeat_cnt != SGL_ANIM_REPEAT_LOOP) {
