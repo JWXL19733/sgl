@@ -193,9 +193,9 @@ void sgl_anim_task(void)
     int32_t value = 0;
     uint32_t elaps_time = 0;
     const uint32_t current_tick = sgl_tick_get();
-    sgl_anim_t *anim = sgl_anim_ctx.anim_list_head, *next = NULL;
+    sgl_anim_t *anim = NULL, *next = NULL;
 
-    for (; anim != NULL; anim = anim->next) {
+    sgl_anim_for_each (anim, &sgl_anim_ctx) {
         if(current_tick < anim->act_time) {
             continue;
         }
