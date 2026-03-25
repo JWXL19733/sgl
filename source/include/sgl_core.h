@@ -1716,33 +1716,21 @@ static inline sgl_obj_t* sgl_screen_act(void)
 
 
 /**
- * @brief sgl task handle function with sync mode
+ * @brief sgl task handler function with sync mode
  * @param none
  * @return none
  * @note you can call this function to force update screen
  */
-void sgl_task_handle_sync(void);
+void sgl_task_handler_sync(void);
 
 
 /**
- * @brief sgl task handle function
+ * @brief sgl task handler function
  * @param none
  * @return none
  * @note this function should be called in main loop or timer or thread
  */
-static inline void sgl_task_handle(void)
-{
-    const uint32_t tick = sgl_tick_get();
-    /* If the system tick time has not been reached, skip directly. */
-    if ((tick - sgl_last_tick_get()) < SGL_SYSTEM_TICK_MS) {
-        return;
-    }
-    /* sync last tick */
-    sgl_system.last_tick = tick;
-
-    /* If the system tick time has been reached, execute the task. */
-    sgl_task_handle_sync();
-}
+void sgl_task_handler(void);
 
 
 /**
@@ -1780,11 +1768,7 @@ void sgl_obj_delete(sgl_obj_t *obj);
  * @return none
  * @note this function will take effect immediately
  */
-static inline void sgl_obj_delete_sync(sgl_obj_t *obj)
-{
-    sgl_obj_delete(obj);
-    sgl_task_handle_sync();
-}
+void sgl_obj_delete_sync(sgl_obj_t *obj);
 
 
 /**

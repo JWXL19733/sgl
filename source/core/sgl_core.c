@@ -1060,6 +1060,19 @@ void sgl_obj_delete(sgl_obj_t *obj)
 
 
 /**
+ * @brief delete object
+ * @param obj point to object
+ * @return none
+ * @note this function will take effect immediately
+ */
+void sgl_obj_delete_sync(sgl_obj_t *obj)
+{
+    sgl_obj_delete(obj);
+    sgl_task_handler_sync();
+}
+
+
+/**
  * @brief Convert UTF-8 string to Unicode
  * @param utf8_str Pointer to the UTF-8 string to be converted
  * @param p_unicode_buffer Pointer to the buffer where the converted Unicode will be stored
@@ -1760,12 +1773,12 @@ static inline void sgl_draw_task(sgl_fbdev_t *fbdev)
 
 
 /**
- * @brief sgl task handle function with sync mode
+ * @brief sgl task handler function with sync mode
  * @param none
  * @return none
  * @note you can call this function for force update screen
  */
-void sgl_task_handle_sync(void)
+void sgl_task_handler_sync(void)
 {
     /* event task */
     sgl_event_task();
@@ -1783,4 +1796,25 @@ void sgl_task_handle_sync(void)
 
     /* draw all object into screen */
     sgl_draw_task(&sgl_system.fbdev);
+}
+
+
+/**
+ * @brief sgl task handler function
+ * @param none
+ * @return none
+ * @note this function should be called in main loop or timer or thread
+ */
+void sgl_task_handler(void)
+{
+    const uint32_t tick = sgl_tick_get();
+    /* If the system tick time has not been reached, skip directly. */
+    if ((tick - sgl_last_tick_get()) < SGL_SYSTEM_TICK_MS) {
+        return;
+    }
+    /* sync last tick */
+    sgl_system.last_tick = tick;
+
+    /* If the system tick time has been reached, execute the task. */
+    sgl_task_handler_sync();
 }

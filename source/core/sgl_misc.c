@@ -156,7 +156,7 @@ void sgl_boot_logo(void)
     sgl_anim_start(anim, SGL_ANIM_REPEAT_ONCE);
 
     while (!sgl_anim_is_finished(anim)) {
-        sgl_task_handle();
+        sgl_task_handler();
     }
 
     sgl_anim_delete(anim);
