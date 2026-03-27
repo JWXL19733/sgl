@@ -1032,6 +1032,64 @@ void sgl_obj_update_area(sgl_area_t *area)
 
 
 /**
+ * @brief Set object size
+ * @param obj point to object
+ * @param width: width that you want to set
+ * @param height: height that you want to set
+ * @return none
+ */
+void sgl_obj_set_size(sgl_obj_t *obj, int16_t width, int16_t height)
+{
+    SGL_ASSERT(obj != NULL);
+    obj->coords.x2 = obj->coords.x1 + width - 1;
+    obj->coords.y2 = obj->coords.y1 + height - 1;
+    sgl_obj_set_dirty(obj);
+}
+
+
+/**
+ * @brief Set object width
+ * @param obj point to object
+ * @param width: width that you want to set
+ * @return none
+ */
+void sgl_obj_set_width(sgl_obj_t *obj, int16_t width)
+{
+    SGL_ASSERT(obj != NULL);
+    obj->coords.x2 = obj->coords.x1 + width - 1;
+    sgl_obj_set_dirty(obj);
+}
+
+
+/**
+ * @brief Set object height
+ * @param obj point to object
+ * @param height: height that you want to set
+ * @return none
+ */
+void sgl_obj_set_height(sgl_obj_t *obj, int16_t height)
+{
+    SGL_ASSERT(obj != NULL);
+    obj->coords.y2 = obj->coords.y1 + height - 1;
+    sgl_obj_set_dirty(obj);
+}
+
+
+/**
+ * @brief Set object border width
+ * @param obj point to object
+ * @param border: border width that you want to set
+ * @return none
+ */
+void sgl_obj_set_border_width(sgl_obj_t *obj, uint8_t border)
+{
+    SGL_ASSERT(obj != NULL);
+    obj->border = sgl_min3(border, sgl_obj_get_width(obj) / 2, sgl_obj_get_height(obj) / 2);
+    sgl_obj_set_dirty(obj);
+}
+
+
+/**
  * @brief delete object
  * @param obj point to object
  * @return none

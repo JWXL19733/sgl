@@ -1540,13 +1540,7 @@ void sgl_obj_set_layout(sgl_obj_t *obj, sgl_layout_desc_t *desc);
  * @param height: height that you want to set
  * @return none
  */
-static inline void sgl_obj_set_size(sgl_obj_t *obj, int16_t width, int16_t height)
-{
-    SGL_ASSERT(obj != NULL);
-    obj->coords.x2 = obj->coords.x1 + width - 1;
-    obj->coords.y2 = obj->coords.y1 + height - 1;
-    sgl_obj_set_dirty(obj);
-}
+void sgl_obj_set_size(sgl_obj_t *obj, int16_t width, int16_t height);
 
 
 /**
@@ -1570,11 +1564,7 @@ static inline sgl_size_t sgl_obj_get_size(sgl_obj_t *obj)
  * @param width: width that you want to set
  * @return none
  */
-static inline void sgl_obj_set_width(sgl_obj_t *obj, int16_t width)
-{
-    SGL_ASSERT(obj != NULL);
-    obj->coords.x2 = obj->coords.x1 + width - 1;
-}
+void sgl_obj_set_width(sgl_obj_t *obj, int16_t width);
 
 
 /**
@@ -1595,11 +1585,7 @@ static inline int16_t sgl_obj_get_width(sgl_obj_t *obj)
  * @param height: height that you want to set
  * @return none
  */
-static inline void sgl_obj_set_height(sgl_obj_t *obj, int16_t height)
-{
-    SGL_ASSERT(obj != NULL);
-    obj->coords.y2 = obj->coords.y1 + height - 1;
-}
+void sgl_obj_set_height(sgl_obj_t *obj, int16_t height);
 
 
 /**
@@ -1620,11 +1606,7 @@ static inline int16_t sgl_obj_get_height(sgl_obj_t *obj)
  * @param border: border width that you want to set
  * @return none
  */
-static inline void sgl_obj_set_border_width(sgl_obj_t *obj, uint8_t border)
-{
-    SGL_ASSERT(obj != NULL);
-    obj->border = sgl_min3(border, sgl_obj_get_width(obj) / 2, sgl_obj_get_height(obj) / 2);
-}
+void sgl_obj_set_border_width(sgl_obj_t *obj, uint8_t border);
 
 
 /**
