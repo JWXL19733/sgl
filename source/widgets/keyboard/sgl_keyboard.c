@@ -313,7 +313,7 @@ static inline uint8_t keyboard_index_to_ascii(uint8_t keymode, uint8_t index)
 }
 
 
-static int8_t keyboard_pos_to_index(int16_t x, int16_t y, sgl_keyboard_t *keyboard, int16_t width, int16_t height)
+static int8_t keyboard_pos_to_index(int16_t x, int16_t y, sgl_keyboard_t *keyboard, int16_t width, int16_t height, sgl_area_t *area)
 {
     sgl_obj_t *obj = &keyboard->obj;
     int16_t index = 0, x_index = -1, y_index = -1, key_mode = KEYBOARD_KEY_MODE(keyboard->key_mode);
@@ -359,6 +359,8 @@ static int8_t keyboard_pos_to_index(int16_t x, int16_t y, sgl_keyboard_t *keyboa
     for(int i = 0; i < y_index; i ++) {
         index += keyboard_btn_count[key_mode][i];
     }
+
+    *area = btn;
 
     return (index + x_index);
 }
@@ -438,67 +440,76 @@ static void sgl_keyboard_construct_cb(sgl_surf_t *surf, sgl_obj_t* obj, sgl_even
 
         keyboard->btn_desc.color = btn_color;
     }
-    else if(evt->type == SGL_EVENT_PRESSED || evt->type == SGL_EVENT_OPTION_TAP) {
-        if  (evt->type == SGL_EVENT_PRESSED) {
-            index = keyboard_pos_to_index(evt->pos.x, evt->pos.y, keyboard, body_w, body_h);
-            if(index < 0) {
+    else {
+        index = keyboard_pos_to_index(evt->pos.x, evt->pos.y, keyboard, body_w, body_h, &btn_area);
+
+        if(evt->type == SGL_EVENT_PRESSED || evt->type == SGL_EVENT_OPTION_TAP) {
+            if  (evt->type == SGL_EVENT_PRESSED) {
+                if(index < 0) {
+                    return;
+                }
+                keyboard->key_index = index;
+            }
+
+            uint8_t key_ascii = keyboard_index_to_ascii(keyboard->key_mode, index);
+            if(key_ascii == KEYBOARD_KEY_TO_UPPER) {
+                keyboard->key_mode = KEYBOARD_KEYMODE_UPPER;
+                keyboard->key_index = KEYBOARD_KEY_INVALID;
+                goto dirty;
+            }
+            else if(key_ascii == KEYBOARD_KEY_TO_LOWER) {
+                keyboard->key_mode = KEYBOARD_KEYMODE_LOWER;
+                keyboard->key_index = KEYBOARD_KEY_INVALID;
+                goto dirty;
+            }
+            else if(key_ascii == KEYBOARD_KEY_TO_SPEC) {
+                keyboard->key_mode = KEYBOARD_KEYMODE_SPEC;
+                keyboard->key_index = KEYBOARD_KEY_INVALID;
+                goto dirty;
+            }
+            else if(key_ascii == KEYBOARD_KEY_TO_CLOSE) {
+                sgl_obj_set_destroyed(obj);
                 return;
             }
-            keyboard->key_index = index;
-        }
-
-        uint8_t key_ascii = keyboard_index_to_ascii(keyboard->key_mode, index);
-        if(key_ascii == KEYBOARD_KEY_TO_UPPER) {
-            keyboard->key_mode = KEYBOARD_KEYMODE_UPPER;
-            keyboard->key_index = KEYBOARD_KEY_INVALID;
-        }
-        else if(key_ascii == KEYBOARD_KEY_TO_LOWER) {
-            keyboard->key_mode = KEYBOARD_KEYMODE_LOWER;
-            keyboard->key_index = KEYBOARD_KEY_INVALID;
-        }
-        else if(key_ascii == KEYBOARD_KEY_TO_SPEC) {
-            keyboard->key_mode = KEYBOARD_KEYMODE_SPEC;
-            keyboard->key_index = KEYBOARD_KEY_INVALID;
-        }
-        else if(key_ascii == KEYBOARD_KEY_TO_CLOSE) {
-            sgl_obj_set_destroyed(obj);
-            return;
-        }
-        else {
-            keyboard->opcode = key_ascii;
-            if (keyboard->edit) {
-                keyboard_btn_handler(keyboard);
+            else {
+                keyboard->opcode = key_ascii;
+                if (keyboard->edit) {
+                    keyboard_btn_handler(keyboard);
+                }
             }
+
+            sgl_obj_update_area(&btn_area);
         }
-
-        sgl_obj_set_dirty(obj);
-    }
-    else if(evt->type == SGL_EVENT_RELEASED) {
-        keyboard->key_index = KEYBOARD_KEY_INVALID;
-        sgl_obj_set_dirty(obj);
-    }
-    else if(evt->type == SGL_EVENT_DRAW_INIT) {
-        keyboard->opcode = 0;
-        keyboard->key_index = KEYBOARD_KEY_INVALID;
-
-        if (keyboard->key_margin == 0) {
-            keyboard->key_margin = sgl_max(body_w / 128, 1);
+        else if(evt->type == SGL_EVENT_RELEASED) {
+            keyboard->key_index = KEYBOARD_KEY_INVALID;
+            sgl_obj_update_area(&btn_area);
         }
+        else if(evt->type == SGL_EVENT_DRAW_INIT) {
+            keyboard->opcode = 0;
+            keyboard->key_index = KEYBOARD_KEY_INVALID;
 
-        if (keyboard->btn_desc.radius == 0) {
-            keyboard->btn_desc.radius = sgl_max(keyboard->key_margin, 2);
+            if (keyboard->key_margin == 0) {
+                keyboard->key_margin = sgl_max(body_w / 128, 1);
+            }
+
+            if (keyboard->btn_desc.radius == 0) {
+                keyboard->btn_desc.radius = sgl_max(keyboard->key_margin, 2);
+            }
+
+            SGL_ASSERT(keyboard->font != NULL);
         }
+        else if (evt->type == SGL_EVENT_OPTION_WALK) {
+            keyboard->key_index ++;
 
-        SGL_ASSERT(keyboard->font != NULL);
-    }
-    else if (evt->type == SGL_EVENT_OPTION_WALK) {
-        keyboard->key_index ++;
-
-        if (keyboard->key_index >= KEYBOARD_BTN_NUM) {
-            keyboard->key_index = 0;
+            if (keyboard->key_index >= KEYBOARD_BTN_NUM) {
+                keyboard->key_index = 0;
+            }
+            sgl_obj_update_area(&btn_area);
         }
-        sgl_obj_set_dirty(obj);
     }
+    return;
+dirty:
+    sgl_obj_set_dirty(obj);
 }
 
 
