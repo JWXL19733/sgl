@@ -239,6 +239,23 @@ void sgl_linechart_set_x_labels(sgl_obj_t *obj, const char **labels, uint8_t cou
     chart->x_label_count = count;
     sgl_obj_set_dirty(obj);
 }
+
+void sgl_linechart_update_value(sgl_obj_t *obj, uint8_t series_index, uint16_t point_index)
+{
+    SGL_ASSERT(obj != NULL);
+    sgl_linechart_t *chart = sgl_container_of(obj, sgl_linechart_t, obj);
+
+    if (chart->series == NULL || series_index >= chart->series_count) {
+        SGL_LOG_ERROR("sgl_linechart_update_value: invalid series index %d", series_index);
+        return;
+    }
+    if (chart->series[series_index].y_data == NULL || point_index >= chart->series[series_index].point_count) {
+        SGL_LOG_ERROR("sgl_linechart_update_value: invalid point index %d", point_index);
+        return;
+    }
+
+    sgl_obj_set_dirty(obj);
+}
  
  
 /**

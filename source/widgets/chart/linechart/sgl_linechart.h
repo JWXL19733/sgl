@@ -107,6 +107,9 @@ typedef struct sgl_linechart_axis {
     int32_t           min;
     int32_t           max;
     int32_t           step;
+    const sgl_font_t *label_font;
+    sgl_color_t       grid_color;
+    sgl_color_t       label_color;
     uint8_t           auto_scale   : 1;
     uint8_t           show_grid    : 1;
     uint8_t           grid_dashed  : 1;
@@ -114,10 +117,7 @@ typedef struct sgl_linechart_axis {
     uint8_t           show_ticks   : 1;  /**< show small tick marks at axis edge */
     uint8_t           reserved     : 3;
     uint8_t           auto_divisions;
-    sgl_color_t       grid_color;
     uint8_t           grid_alpha;
-    const sgl_font_t *label_font;
-    sgl_color_t       label_color;
     uint8_t           label_alpha;
 } sgl_linechart_axis_t;
 
@@ -142,6 +142,9 @@ typedef struct sgl_linechart_axis {
 typedef struct sgl_linechart_series {
     const int32_t    *x_data;
     const int32_t    *y_data;
+    const char       *label;
+    sgl_color_t       line_color;
+    sgl_color_t       fill_color;
     uint16_t          point_count;
     uint8_t           show_line   : 1;
     uint8_t           show_points : 1;
@@ -150,11 +153,8 @@ typedef struct sgl_linechart_series {
     uint8_t           reserved    : 3;
     uint8_t           line_width;
     uint8_t           point_radius;
-    sgl_color_t       line_color;
     uint8_t           line_alpha;
-    sgl_color_t       fill_color;
     uint8_t           fill_alpha;
-    const char       *label;
 } sgl_linechart_series_t;
 
 
@@ -188,7 +188,7 @@ typedef struct sgl_linechart {
     const char           **x_labels;       /**< Optional X axis labels, array of persistent strings */
     uint8_t               x_label_count;   /**< Number of X axis labels */
     sgl_area_t            plot_rel_rect;   /**< Custom plot area relative to widget (x1,y1,x2,y2) */
-    uint8_t               custom_plot_rect;/**< 0: auto layout (default), non-zero: use plot_rel_rect */
+    uint8_t               custom_plot_rect  : 1;/**< 0: auto layout (default), non-zero: use plot_rel_rect */
     uint8_t               open_anim_enable  : 1;
     uint8_t               open_anim_playing : 1;
     uint8_t               open_anim_dir     : 2;
@@ -250,6 +250,7 @@ void sgl_linechart_set_series_y_array(sgl_obj_t *obj, uint8_t index,
  * @param count  number of labels
  */
 void sgl_linechart_set_x_labels(sgl_obj_t *obj, const char **labels, uint8_t count);
+void sgl_linechart_update_value(sgl_obj_t *obj, uint8_t series_index, uint16_t point_index);
  
  
 /**
