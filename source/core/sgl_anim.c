@@ -191,7 +191,7 @@ void sgl_anim_delete(sgl_anim_t *anim)
 void sgl_anim_task(void)
 {
     int32_t value = 0;
-    uint32_t elaps_time = 0;
+    uint16_t elaps_time = 0;
     const uint32_t current_tick = sgl_tick_get();
     sgl_anim_t *anim = NULL, *next = NULL;
 
@@ -253,7 +253,7 @@ void sgl_anim_task(void)
  *                  Uses 32-bit integer arithmetic to avoid floating-point operations
  *                  for better performance on embedded systems
  */
-int32_t sgl_anim_path_linear(uint32_t elaps, uint32_t duration, int32_t start, int32_t end)
+int32_t sgl_anim_path_linear(uint16_t elaps, uint16_t duration, int32_t start, int32_t end)
 {
     int64_t progress_fixed, delta, result;
 
@@ -294,7 +294,7 @@ int32_t sgl_anim_path_linear(uint32_t elaps, uint32_t duration, int32_t start, i
  * @param end       End value
  * @return          Interpolated value at current time
  */
-int32_t sgl_anim_path_ease_in_out(uint32_t elaps, uint32_t duration, int32_t start, int32_t end)
+int32_t sgl_anim_path_ease_in_out(uint16_t elaps, uint16_t duration, int32_t start, int32_t end)
 {
     int32_t t_180, cos_val, delta;
     if (elaps >= duration)
@@ -329,7 +329,7 @@ int32_t sgl_anim_path_ease_in_out(uint32_t elaps, uint32_t duration, int32_t sta
  * @param end       End value
  * @return          Interpolated value at current time
  */
-int32_t sgl_anim_path_ease_out(uint32_t elaps, uint32_t duration, int32_t start, int32_t end)
+int32_t sgl_anim_path_ease_out(uint16_t elaps, uint16_t duration, int32_t start, int32_t end)
 {
     int32_t angle, sin_val, delta;
     if (elaps >= duration)
@@ -359,7 +359,7 @@ int32_t sgl_anim_path_ease_out(uint32_t elaps, uint32_t duration, int32_t start,
  * @param end       End value
  * @return          Interpolated value at current time
  */
-int32_t sgl_anim_path_ease_in(uint32_t elaps, uint32_t duration, int32_t start, int32_t end)
+int32_t sgl_anim_path_ease_in(uint16_t elaps, uint16_t duration, int32_t start, int32_t end)
 {
     int32_t angle, cos_val, delta;
     if (elaps >= duration)
@@ -390,7 +390,7 @@ int32_t sgl_anim_path_ease_in(uint32_t elaps, uint32_t duration, int32_t start, 
  * @param end       Target end value of the animated property
  * @return          Interpolated value of the animated property at the current elapsed time
  */
-int32_t sgl_anim_path_overshoot(uint32_t elaps, uint32_t duration, int32_t start, int32_t end)
+int32_t sgl_anim_path_overshoot(uint16_t elaps, uint16_t duration, int32_t start, int32_t end)
 {
     int64_t t, t1, t2, inv_t2, ease_back, diff, progress;
     if (elaps >= duration)
