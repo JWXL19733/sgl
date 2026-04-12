@@ -537,7 +537,7 @@ void sgl_scope_set_channel_data_buffer(sgl_obj_t* obj, uint8_t channel, int16_t 
  * @param index data index
  * @return data value
  */
-static inline int16_t sgl_scope_get_channel_data(sgl_obj_t* obj, uint8_t channel, uint32_t index)
+int16_t sgl_scope_get_channel_data(sgl_obj_t* obj, uint8_t channel, uint32_t index)
 {
     sgl_scope_t *scope = sgl_container_of(obj, sgl_scope_t, obj);
     if (channel >= scope->channel_count || index >= scope->data_len) 
@@ -552,7 +552,7 @@ static inline int16_t sgl_scope_get_channel_data(sgl_obj_t* obj, uint8_t channel
  * @param max_points max display points
  * @return none
  */
-static inline void sgl_scope_set_max_display_points(sgl_obj_t* obj, uint8_t max_points)
+void sgl_scope_set_max_display_points(sgl_obj_t* obj, uint8_t max_points)
 {
     sgl_scope_t *scope = sgl_container_of(obj, sgl_scope_t, obj);
     scope->max_display_points = max_points;
