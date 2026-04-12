@@ -78,19 +78,19 @@ static void sgl_label_construct_cb(sgl_surf_t *surf, sgl_obj_t* obj, sgl_event_t
             }
 
             sgl_surf_t temp_surf = {
-                .x1 = 0,
-                .y1 = 0,
-                .x2 = width - 1,
-                .y2 = height - 1,
+                .x1 = align_pos.x,
+                .y1 = align_pos.y,
+                .x2 = 0,
+                .y2 = 0,
                 .buffer = temp_buf,
                 .w = width,
                 .h = height,
                 .dirty = NULL
             };
 
-            sgl_draw_string(&temp_surf, &obj->area, align_pos.x, align_pos.y, 
+            sgl_draw_string(&temp_surf, &obj->area, align_pos.x, align_pos.y,
                                               label->text, label->color, label->alpha, label->font);
-            sgl_draw_xform_surf(surf, &temp_surf, &obj->area, obj->coords.x1, obj->coords.y1, label->transform.rotation);
+            sgl_draw_xform_surf(surf, &temp_surf, &obj->parent->area, obj->coords.x1, obj->coords.y1, label->transform.rotation);
 
             sgl_free(temp_buf);
         }
