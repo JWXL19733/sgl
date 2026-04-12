@@ -857,12 +857,6 @@ void sgl_dirty_area_push(sgl_area_t *area)
         return;
     }
 
-    if (sgl_system.fbdev.dirty_num == 0) {
-        sgl_system.fbdev.dirty[0] = *area;
-        sgl_system.fbdev.dirty_num = 1;
-        return;
-    }
-
     for (uint8_t i = 0; i < sgl_system.fbdev.dirty_num; i++) {
         if (sgl_merge_determines(&sgl_system.fbdev.dirty[i], area)) {
             growth = sgl_area_growth(&sgl_system.fbdev.dirty[i], area);
@@ -1042,10 +1036,15 @@ void sgl_obj_update_area(sgl_area_t *area)
 {
     SGL_ASSERT(area != NULL);
     sgl_area_t clip = sgl_system.fbdev.active->area;
+
     clip.x1 = sgl_max(clip.x1, area->x1);
     clip.x2 = sgl_min(clip.x2, area->x2);
     clip.y1 = sgl_max(clip.y1, area->y1);
     clip.y2 = sgl_min(clip.y2, area->y2);
+
+    if (clip.x1 > clip.x2 || clip.y1 > clip.y2) {
+        return;
+    }
 
     if (sgl_system.fbdev.dirty_num < SGL_DIRTY_AREA_NUM_MAX) {
         /* add new dirty area */
