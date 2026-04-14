@@ -79,8 +79,6 @@ sgl_obj_t* sgl_circle_create(sgl_obj_t* parent)
     circle->desc.pixmap = NULL;
     circle->desc.border = SGL_THEME_BORDER_WIDTH;
     circle->desc.border_color = SGL_THEME_BORDER_COLOR;
-    circle->desc.cx = -1;
-    circle->desc.cy = -1;
 
     return obj;
 }
@@ -108,7 +106,7 @@ void sgl_circle_set_radius(sgl_obj_t *obj, uint16_t radius)
 {
     sgl_circle_t *circle = sgl_container_of(obj, sgl_circle_t, obj);
     obj->radius > 0 ? sgl_obj_size_zoom(obj, radius - obj->radius) : 0;
-    circle->desc.radius = obj->radius = sgl_is_odd(radius) ? radius : radius - 1;
+    circle->desc.radius = obj->radius = radius;
     sgl_obj_set_dirty(obj);
 }
 
