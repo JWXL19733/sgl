@@ -51,6 +51,7 @@ typedef struct sgl_keyboard {
     uint8_t          key_margin;
     int8_t           key_index;
     uint8_t          key_mode;
+    sgl_area_t       btn_area;
 } sgl_keyboard_t;
 
 
