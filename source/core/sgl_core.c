@@ -1705,11 +1705,6 @@ static inline void sgl_dirty_area_harvest(sgl_obj_t *obj)
             stack[top++] = obj->sibling;
         }
 
-        /* if object is hidden, skip it */
-        if (unlikely(sgl_obj_is_hidden(obj))) {
-            continue;
-        }
-
         /* check if obj is destroyed */
         if (unlikely(sgl_obj_is_destroyed(obj))) {
             /* merge destroy area */
@@ -1730,6 +1725,11 @@ static inline void sgl_dirty_area_harvest(sgl_obj_t *obj)
             sgl_obj_free(obj);
 
             /* object is destroyed, skip */
+            continue;
+        }
+
+        /* if object is hidden, skip it */
+        if (unlikely(sgl_obj_is_hidden(obj))) {
             continue;
         }
 
