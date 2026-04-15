@@ -131,7 +131,6 @@ static void sgl_dropdown_construct_cb(sgl_surf_t *surf, sgl_obj_t* obj, sgl_even
         if (dropdown->is_open) {
             dropdown->is_open = false;
             obj->coords.y2 -= dropdown->expand_h;
-                SGL_LOG_INFO("sgl_dropdown_construct_cb: selected %d  %d  %d", evt->pos.y, obj->coords.y2, dropdown->font->font_height);
             if (evt->pos.y > obj->coords.y2) {
                 dropdown->selected = (evt->pos.y - obj->coords.y2) / dropdown->font->font_height;
             }
