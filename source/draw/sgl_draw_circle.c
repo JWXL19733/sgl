@@ -43,17 +43,9 @@ void sgl_draw_fill_circle(sgl_surf_t *surf, sgl_area_t *area, int16_t cx, int16_
     sgl_area_t clip = SGL_AREA_MAX;
     sgl_surf_clip_area_return(surf, area, &clip);
 
-    sgl_area_t c_rect = {
-        .x1 = cx - radius + 1,
-        .x2 = cx + radius,
-        .y1 = cy - radius + 1,
-        .y2 = cy + radius
-    };
-    if (!sgl_area_selfclip(&clip, &c_rect)) return;
-
     uint8_t edge_alpha;
-    int cx2 = c_rect.x1 + c_rect.x2;
-    int cy2 = c_rect.y1 + c_rect.y2;
+    int cx2 = 2 * cx + 1;
+    int cy2 = 2 * cy + 1;
     int dx2 = 0, dy2 = 0;
     const int diameter = radius << 1;
     const int r2_max = sgl_pow2(diameter);
@@ -102,20 +94,10 @@ void sgl_draw_fill_circle_pixmap(sgl_surf_t *surf, sgl_area_t *area, int16_t cx,
     sgl_area_t clip = SGL_AREA_MAX;
     sgl_surf_clip_area_return(surf, area, &clip);
 
-    sgl_area_t c_rect = {
-        .x1 = cx - radius + 1,
-        .x2 = cx + radius,
-        .y1 = cy - radius + 1,
-        .y2 = cy + radius
-    };
-    if (!sgl_area_selfclip(&clip, &c_rect)) {
-        return;
-    }
-
     uint8_t edge_alpha = 0;
     int s_x = cx - radius, s_y = cy - radius;
-    int cx2 = c_rect.x1 + c_rect.x2;
-    int cy2 = c_rect.y1 + c_rect.y2;
+    int cx2 = 2 * cx + 1;
+    int cy2 = 2 * cy + 1;
     int dx2 = 0, dy2 = 0;
     const int diameter = radius << 1;
     const int r2_max = sgl_pow2(diameter);
@@ -159,20 +141,10 @@ void sgl_draw_fill_circle_pixmap(sgl_surf_t *surf, sgl_area_t *area, int16_t cx,
     sgl_area_t clip = SGL_AREA_MAX;
     sgl_surf_clip_area_return(surf, area, &clip);
 
-    sgl_area_t c_rect = {
-        .x1 = cx - radius + 1,
-        .x2 = cx + radius,
-        .y1 = cy - radius + 1,
-        .y2 = cy + radius
-    };
-    if (!sgl_area_selfclip(&clip, &c_rect)) {
-        return;
-    }
-
     uint8_t edge_alpha = 0;
     int s_x = cx - radius, s_y = cy - radius;
-    int cx2 = c_rect.x1 + c_rect.x2;
-    int cy2 = c_rect.y1 + c_rect.y2;
+    int cx2 = 2 * cx + 1;
+    int cy2 = 2 * cy + 1;
     int dx2 = 0, dy2 = 0;
     const int diameter = radius << 1;
     const int r2_max = sgl_pow2(diameter);
@@ -231,16 +203,8 @@ void sgl_draw_fill_circle_with_border(sgl_surf_t *surf, sgl_area_t *area, int16_
     sgl_area_t clip = SGL_AREA_MAX;
     sgl_surf_clip_area_return(surf, area, &clip);
 
-    sgl_area_t c_rect = {
-        .x1 = cx - radius + 1,
-        .x2 = cx + radius,
-        .y1 = cy - radius + 1,
-        .y2 = cy + radius
-    };
-    if (!sgl_area_selfclip(&clip, &c_rect)) return;
-
-    int cx2 = c_rect.x1 + c_rect.x2;
-    int cy2 = c_rect.y1 + c_rect.y2;
+    int cx2 = 2 * cx + 1;
+    int cy2 = 2 * cy + 1;
     int radius_in = sgl_max(radius - border_width, 0);
 
     const int out_diameter = radius << 1;
