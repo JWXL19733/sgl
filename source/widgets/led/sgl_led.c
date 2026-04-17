@@ -38,52 +38,44 @@ static void sgl_led_construct_cb(sgl_surf_t *surf, sgl_obj_t* obj, sgl_event_t *
     sgl_led_t *led = sgl_container_of(obj, sgl_led_t, obj);
     int16_t cx = 0, cy = 0;
     sgl_color_t color = led->status ? led->on_color : led->off_color;
-    sgl_color_t *buf = NULL, *blend = NULL;
 
     if(evt->type == SGL_EVENT_DRAW_MAIN) {
-        sgl_area_t clip; 
+        sgl_area_t clip = SGL_AREA_MAX;
+        sgl_surf_clip_area_return(surf, &obj->area, &clip);
 
-        cx = (led->obj.coords.x1 + led->obj.coords.x2) / 2;
-        cy = (led->obj.coords.y1 + led->obj.coords.y2) / 2;
+        cx = (obj->coords.x1 + obj->coords.x2) / 2;
+        cy = (obj->coords.y1 + obj->coords.y2) / 2;
 
-        if (!sgl_surf_clip(surf, &obj->area, &clip)) {
-            return;
-        }
-
-        sgl_area_t c_rect = {
-            .x1 = cx - obj->radius,
-            .x2 = cx + obj->radius,
-            .y1 = cy - obj->radius,
-            .y2 = cy + obj->radius
-        };
-        if (!sgl_area_selfclip(&clip, &c_rect)) {
-            return;
-        }
-
-        int y2 = 0, real_r2 = 0, edge_alpha = 0;
-        int r2 = sgl_pow2(obj->radius);
-        int r2_edge = sgl_pow2(obj->radius + 1);
+        uint8_t edge_alpha;
+        int cx2 = 2 * cx + 1;
+        int cy2 = 2 * cy + 1;
+        int dx2 = 0, dy2 = 0;
+        const int diameter = obj->radius << 1;
+        const int r2_max = sgl_pow2(diameter);
+        const int r2 = sgl_max(sgl_pow2(diameter - 4), 0); 
+        const int r2_fix_diff = (SGL_ALPHA_MAX  << SGL_FIXED_SHIFT) / sgl_max(r2_max - r2, 1);
         int ds_alpha = SGL_ALPHA_MIN;
+        sgl_color_t *blend, *buf = sgl_surf_get_buf(surf, clip.x1 - surf->x1, clip.y1 - surf->y1);
 
         buf = sgl_surf_get_buf(surf, clip.x1 - surf->x1, clip.y1 - surf->y1);
         for (int y = clip.y1; y <= clip.y2; y++) {
-            y2 = sgl_pow2(y - cy);
             blend = buf;
+            dy2 = sgl_pow2(2 * y - cy2);
 
             for (int x = clip.x1; x <= clip.x2; x++, blend++) {
-                real_r2 = sgl_pow2(x - cx) + y2;
-                if (real_r2 >= r2_edge) {
+                dx2 = sgl_pow2(2 * x - cx2) + dy2;
+                if (dx2 >= r2_max) {
                     if(x > cx)
                         break;
                     continue;
                 }
-                else if (real_r2 >= r2) {
-                    edge_alpha = SGL_ALPHA_MAX - sgl_sqrt_error(real_r2);
+                else if (dx2 >= r2) {
+                    edge_alpha = ((r2_max - dx2) * r2_fix_diff) >> SGL_FIXED_SHIFT;
                     sgl_color_t color_mix = sgl_color_mixer(led->bg_color, *blend, edge_alpha);
                     *blend = sgl_color_mixer(color_mix, *blend, led->alpha);
                 }
                 else {
-                    ds_alpha = real_r2 * SGL_ALPHA_NUM / r2;
+                    ds_alpha = dx2 * SGL_ALPHA_NUM / r2;
                     ds_alpha = sgl_pow2(ds_alpha) / SGL_ALPHA_NUM ;
                     *blend = sgl_color_mixer(sgl_color_mixer(led->bg_color, color, ds_alpha), *blend, led->alpha);//SGL_THEME_BG_COLOR
                 }
