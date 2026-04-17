@@ -65,17 +65,26 @@ void sgl_draw_fill_rect(sgl_surf_t *surf, sgl_area_t *area, sgl_area_t *rect, in
 {
     sgl_area_t clip = SGL_AREA_INVALID;
     sgl_color_t *buf = NULL, *blend = NULL;
-    
+    uint8_t solid_alpha = (alpha == SGL_ALPHA_MAX);
+
     if (!sgl_surf_clip(surf, area, &clip)) return;
     if (!sgl_area_selfclip(&clip, rect)) return;
 
+    int pixel_count = clip.x2 - clip.x1 + 1;
     buf = sgl_surf_get_buf(surf, clip.x1 - surf->x1, clip.y1 - surf->y1);
 
     if (radius <= 0) {
         for (int y = clip.y1; y <= clip.y2; y++) {
             blend = buf;
-            for (int x = clip.x1; x <= clip.x2; x++, blend++) {
-                *blend = (alpha == SGL_ALPHA_MAX) ? color : sgl_color_mixer(color, *blend, alpha);
+            if (solid_alpha) {
+                for (int i = 0; i < pixel_count; i++) {
+                    blend[i] = color;
+                }
+            }
+            else {
+                for (int i = 0; i < pixel_count; i++) {
+                    blend[i] = sgl_color_mixer(color, blend[i], alpha);
+                }
             }
             buf += surf->w;
         }
@@ -99,8 +108,17 @@ void sgl_draw_fill_rect(sgl_surf_t *surf, sgl_area_t *area, sgl_area_t *rect, in
     for (int y = clip.y1; y <= clip.y2; y++) {
         blend = buf;
         if (y >= cy1 && y <= cy2) {
-            for (int x = clip.x1; x <= clip.x2; x++, blend++) {
-                *blend = (alpha == SGL_ALPHA_MAX ? color : sgl_color_mixer(color, *blend, alpha));
+            pixel_count = clip.x2 - clip.x1 + 1;
+            solid_alpha = (alpha == SGL_ALPHA_MAX);
+
+            if (solid_alpha) {
+                for (int i = 0; i < pixel_count; i++) {
+                    blend[i] = color;
+                }
+            } else {
+                for (int i = 0; i < pixel_count; i++) {
+                    blend[i] = sgl_color_mixer(color, blend[i], alpha);
+                }
             }
         }
         else {
