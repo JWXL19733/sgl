@@ -264,30 +264,16 @@ void sgl_draw_fill_rect_with_border(sgl_surf_t *surf, sgl_area_t *area, sgl_area
  */
 void sgl_draw_fill_rect_pixmap(sgl_surf_t *surf, sgl_area_t *area, sgl_area_t *rect, int16_t radius, const sgl_pixmap_t *pixmap, uint8_t alpha)
 {
-    sgl_area_t clip;
-    sgl_color_t *buf = NULL, *blend = NULL;
-    sgl_color_t *pbuf = NULL;
-    uint8_t edge_alpha = 0;
-    int cx1 = rect->x1 + radius;
-    int cx2 = rect->x2 - radius;
-    int cy1 = rect->y1 + radius;
-    int cy2 = rect->y2 - radius;
-    int cx_tmp = 0;
-    int cy_tmp = 0;
+    sgl_area_t clip = SGL_AREA_INVALID;
+    sgl_color_t *buf = NULL, *blend = NULL, *pbuf = (sgl_color_t *)pixmap->bitmap.array;
+    
+    if (!sgl_surf_clip(surf, area, &clip)) return;
+    if (!sgl_area_selfclip(&clip, rect)) return;
 
-    if (!sgl_surf_clip(surf, area, &clip)) {
-        return;
-    }
-
-    if (!sgl_area_selfclip(&clip, rect)) {
-        return;
-    }
-
-    int y2 = 0, real_r2 = 0;
-    int r2 = sgl_pow2(radius);
-    int r2_edge = sgl_pow2(radius + 1);
-    uint32_t scale_x = ((pixmap->width << SGL_FIXED_SHIFT) / (rect->x2 - rect->x1 + 1));
-    uint32_t scale_y = ((pixmap->height << SGL_FIXED_SHIFT) / (rect->y2 - rect->y1 + 1));
+    const int32_t rect_w = rect->x2 - rect->x1 + 1;
+    const int32_t rect_h = rect->y2 - rect->y1 + 1;
+    const int32_t scale_x = ((int32_t)pixmap->width << SGL_FIXED_SHIFT) / rect_w;
+    const int32_t scale_y = ((int32_t)pixmap->height << SGL_FIXED_SHIFT) / rect_h;
     uint32_t step_x = 0, step_y = 0;
 
     buf = sgl_surf_get_buf(surf, clip.x1 - surf->x1, clip.y1 - surf->y1);
@@ -303,46 +289,57 @@ void sgl_draw_fill_rect_pixmap(sgl_surf_t *surf, sgl_area_t *area, sgl_area_t *r
             buf += surf->w;
         }
     }
-    else {
-        for (int y = clip.y1; y <= clip.y2; y++) {
-            blend = buf;
-            step_y = (scale_y * (y - rect->y1)) >> SGL_FIXED_SHIFT;
-            if (y > cy1 && y < cy2) {
-                for (int x = clip.x1; x <= clip.x2; x++, blend++) {
-                    step_x = (scale_x * (x - rect->x1)) >> SGL_FIXED_SHIFT;
-                    pbuf = sgl_pixmap_get_buf(pixmap, step_x, step_y);
+
+    const int cx1 = rect->x1 + radius;
+    const int cx2 = rect->x2 - radius;
+    const int cy1 = rect->y1 + radius;
+    const int cy2 = rect->y2 - radius;
+
+    const int r2 = sgl_pow2(radius);
+    const int r2_max = sgl_pow2(radius + 1);
+    const int r2_diff = sgl_max(r2_max - r2, 1);
+    const int r2_fix_diff = (SGL_ALPHA_MAX << SGL_FIXED_SHIFT) / r2_diff;
+    int dy2, real_r2, cx_tmp, cy_tmp;
+    uint8_t edge_alpha;
+
+    for (int y = clip.y1; y <= clip.y2; y++) {
+        blend = buf;
+        step_y = (scale_y * (y - rect->y1)) >> SGL_FIXED_SHIFT;
+        if (y >= cy1 && y <= cy2) {
+            for (int x = clip.x1; x <= clip.x2; x++, blend++) {
+                step_x = (scale_x * (x - rect->x1)) >> SGL_FIXED_SHIFT;
+                pbuf = sgl_pixmap_get_buf(pixmap, step_x, step_y);
+                *blend = (alpha == SGL_ALPHA_MAX ? *pbuf : sgl_color_mixer(*pbuf, *blend, alpha));
+            }
+        }
+        else {
+            cy_tmp = (y < cy1) ? cy1 : cy2;
+            dy2 = sgl_pow2(y - cy_tmp);
+
+            for (int x = clip.x1; x <= clip.x2; x++, blend++) {
+                step_x = (scale_x * (x - rect->x1)) >> SGL_FIXED_SHIFT;
+                pbuf = sgl_pixmap_get_buf(pixmap, step_x, step_y);
+
+                if (x >= cx1 && x <= cx2) {
                     *blend = (alpha == SGL_ALPHA_MAX ? *pbuf : sgl_color_mixer(*pbuf, *blend, alpha));
                 }
-            }
-            else {
-                cy_tmp = y > cy1 ? cy2 : cy1;
-                y2 = sgl_pow2(y - cy_tmp);
-
-                for (int x = clip.x1; x <= clip.x2; x++, blend++) {
-                    step_x = (scale_x * (x - rect->x1)) >> SGL_FIXED_SHIFT;
-                    pbuf = sgl_pixmap_get_buf(pixmap, step_x, step_y);
-
-                    if (x > cx1 && x < cx2) {
-                        *blend = (alpha == SGL_ALPHA_MAX ? *pbuf : sgl_color_mixer(*pbuf, *blend, alpha));
+                else {
+                    cx_tmp = (x < cx1) ? cx1 : cx2;
+                    real_r2 = sgl_pow2(x - cx_tmp) + dy2;
+                    if (real_r2 >= r2_max) {
+                        continue;
+                    }
+                    else if (real_r2 >= r2) {
+                        edge_alpha = ((r2_max - real_r2) * r2_fix_diff) >> SGL_FIXED_SHIFT;
+                        *blend = (alpha == SGL_ALPHA_MAX ? sgl_color_mixer(*pbuf, *blend, edge_alpha) : sgl_color_mixer(sgl_color_mixer(*pbuf, *blend, edge_alpha), *blend, alpha));
                     }
                     else {
-                        cx_tmp = x > cx1 ? cx2 : cx1;
-                        real_r2 = sgl_pow2(x - cx_tmp) + y2;
-                        if (real_r2 >= r2_edge) {
-                            continue;
-                        }
-                        else if (real_r2 >= r2) {
-                            edge_alpha = SGL_ALPHA_MAX - sgl_sqrt_error(real_r2);
-                            *blend = (alpha == SGL_ALPHA_MAX ? sgl_color_mixer(*pbuf, *blend, edge_alpha) : sgl_color_mixer(sgl_color_mixer(*pbuf, *blend, edge_alpha), *blend, alpha));
-                        }
-                        else {
-                            *blend = (alpha == SGL_ALPHA_MAX ? *pbuf : sgl_color_mixer(*pbuf, *blend, alpha));
-                        }
+                        *blend = (alpha == SGL_ALPHA_MAX ? *pbuf : sgl_color_mixer(*pbuf, *blend, alpha));
                     }
                 }
             }
-            buf += surf->w;
         }
+        buf += surf->w;
     }
 }
 
@@ -359,91 +356,85 @@ void sgl_draw_fill_rect_pixmap(sgl_surf_t *surf, sgl_area_t *area, sgl_area_t *r
  */
 void sgl_draw_fill_rect_pixmap(sgl_surf_t *surf, sgl_area_t *area, sgl_area_t *rect, int16_t radius, const sgl_pixmap_t *pixmap, uint8_t alpha)
 {
-    sgl_area_t clip;
-    sgl_color_t *buf = NULL, *blend = NULL, *pix = (sgl_color_t *)pixmap->bitmap.array;
-    sgl_color_t ip_color;
-    uint8_t edge_alpha = 0;
-    int cx1 = rect->x1 + radius;
-    int cx2 = rect->x2 - radius;
-    int cy1 = rect->y1 + radius;
-    int cy2 = rect->y2 - radius;
+    sgl_area_t clip = SGL_AREA_INVALID;
+    sgl_color_t *buf = NULL, *blend = NULL, *pbuf = (sgl_color_t *)pixmap->bitmap.array, ip_color;
+    
+    if (!sgl_surf_clip(surf, area, &clip)) return;
+    if (!sgl_area_selfclip(&clip, rect)) return;
+
     int cx_tmp = 0, fx = 0;
     int cy_tmp = 0, fy = 0;
-
-    if (!sgl_surf_clip(surf, area, &clip)) {
-        return;
-    }
-
-    if (!sgl_area_selfclip(&clip, rect)) {
-        return;
-    }
-
-    int y2 = 0, real_r2 = 0;
-    int r2 = sgl_pow2(radius);
-    int r2_edge = sgl_pow2(radius + 1);
-
     const int32_t rect_w = rect->x2 - rect->x1 + 1;
     const int32_t rect_h = rect->y2 - rect->y1 + 1;
     const int32_t scale_x = ((int32_t)pixmap->width << SGL_FIXED_SHIFT) / rect_w;
     const int32_t scale_y = ((int32_t)pixmap->height << SGL_FIXED_SHIFT) / rect_h;
-
     buf = sgl_surf_get_buf(surf, clip.x1 - surf->x1, clip.y1 - surf->y1);
 
     if (radius == 0) {
         for (int y = clip.y1; y <= clip.y2; y++) {
             blend = buf;
             fy = (int32_t)(y - rect->y1) * scale_y;
-
             for (int x = clip.x1; x <= clip.x2; x++, blend++) {
                 fx = (int32_t)(x - rect->x1) * scale_x;
-                ip_color = sgl_draw_biln_color(pix, NULL, pixmap->width, pixmap->height, fx, fy);
+                ip_color = sgl_draw_biln_color(pbuf, NULL, pixmap->width, pixmap->height, fx, fy);
                 *blend = (alpha == SGL_ALPHA_MAX) ? ip_color : sgl_color_mixer(ip_color, *blend, alpha);
             }
             buf += surf->w;
         }
+        return;
     }
-    else {
-        for (int y = clip.y1; y <= clip.y2; y++) {
-            blend = buf;
-            fy = (int32_t)(y - rect->y1) * scale_y;
-            
-            if (y > cy1 && y < cy2) {
-                for (int x = clip.x1; x <= clip.x2; x++, blend++) {
-                    fx = (int32_t)(x - rect->x1) * scale_x;
-                    ip_color = sgl_draw_biln_color(pix, NULL, pixmap->width, pixmap->height, fx, fy);
+
+    const int cx1 = rect->x1 + radius;
+    const int cx2 = rect->x2 - radius;
+    const int cy1 = rect->y1 + radius;
+    const int cy2 = rect->y2 - radius;
+
+    const int r2 = sgl_pow2(radius);
+    const int r2_max = sgl_pow2(radius + 1);
+    const int r2_diff = sgl_max(r2_max - r2, 1);
+    const int r2_fix_diff = (SGL_ALPHA_MAX << SGL_FIXED_SHIFT) / r2_diff;
+    int dy2, real_r2;
+    uint8_t edge_alpha;
+
+    for (int y = clip.y1; y <= clip.y2; y++) {
+        blend = buf;
+        fy = (int32_t)(y - rect->y1) * scale_y;
+        if (y >= cy1 && y <= cy2) {
+            for (int x = clip.x1; x <= clip.x2; x++, blend++) {
+                fx = (int32_t)(x - rect->x1) * scale_x;
+                ip_color = sgl_draw_biln_color(pbuf, NULL, pixmap->width, pixmap->height, fx, fy);
+                *blend = (alpha == SGL_ALPHA_MAX) ? ip_color : sgl_color_mixer(ip_color, *blend, alpha);
+            }
+        }
+        else {
+            cy_tmp = (y < cy1) ? cy1 : cy2;
+            dy2 = sgl_pow2(y - cy_tmp);
+
+            for (int x = clip.x1; x <= clip.x2; x++, blend++) {
+                fx = (int32_t)(x - rect->x1) * scale_x;
+                ip_color = sgl_draw_biln_color(pbuf, NULL, pixmap->width, pixmap->height, fx, fy);
+
+                if (x >= cx1 && x <= cx2) {
                     *blend = (alpha == SGL_ALPHA_MAX) ? ip_color : sgl_color_mixer(ip_color, *blend, alpha);
                 }
-            }
-            else {
-                cy_tmp = y > cy1 ? cy2 : cy1;
-                y2 = sgl_pow2(y - cy_tmp);
-
-                for (int x = clip.x1; x <= clip.x2; x++, blend++) {
-                    fx = (int32_t)(x - rect->x1) * scale_x;
-                    ip_color = sgl_draw_biln_color(pix, NULL, pixmap->width, pixmap->height, fx, fy);
-
-                    if (x > cx1 && x < cx2) {
-                        *blend = (alpha == SGL_ALPHA_MAX) ? ip_color : sgl_color_mixer(ip_color, *blend, alpha);
+                else {
+                    cx_tmp = (x < cx1) ? cx1 : cx2;
+                    real_r2 = sgl_pow2(x - cx_tmp) + dy2;
+                    if (real_r2 >= r2_max) {
+                        continue;
+                    }
+                    else if (real_r2 >= r2) {
+                        edge_alpha = ((r2_max - real_r2) * r2_fix_diff) >> SGL_FIXED_SHIFT;
+                        *blend = (alpha == SGL_ALPHA_MAX ? sgl_color_mixer(ip_color, *blend, edge_alpha) : 
+                                 sgl_color_mixer(sgl_color_mixer(ip_color, *blend, edge_alpha), *blend, alpha));
                     }
                     else {
-                        cx_tmp = x > cx1 ? cx2 : cx1;
-                        real_r2 = sgl_pow2(x - cx_tmp) + y2;
-                        if (real_r2 >= r2_edge) {
-                            continue;
-                        }
-                        else if (real_r2 >= r2) {
-                            edge_alpha = SGL_ALPHA_MAX - sgl_sqrt_error(real_r2);
-                            *blend = (alpha == SGL_ALPHA_MAX) ? sgl_color_mixer(ip_color, *blend, edge_alpha) : 
-                                                                sgl_color_mixer(sgl_color_mixer(ip_color, *blend, edge_alpha), *blend, alpha);
-                        }
-                        else {
-                            *blend = (alpha == SGL_ALPHA_MAX) ? ip_color : sgl_color_mixer(ip_color, *blend, alpha);
-                        }
+                        *blend = (alpha == SGL_ALPHA_MAX) ? ip_color : sgl_color_mixer(ip_color, *blend, alpha);
                     }
                 }
             }
-            buf += surf->w;
         }
+        buf += surf->w;
     }
 }
 #endif

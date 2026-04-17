@@ -160,7 +160,7 @@ void sgl_boot_logo(void)
     }
 
     sgl_anim_delete(anim);
-    sgl_obj_delete(logo);
+    sgl_obj_delete_sync(logo);
 }
 
 #endif // !CONFIG_SGL_BOOT_LOGO
