@@ -409,7 +409,7 @@ void sgl_event_pos_input(int16_t x, int16_t y, bool flag)
             curr_pos = first_pos;
             start_ms = tick;
             sgl_event_send_pos(first_pos, SGL_EVENT_PRESSED);
-            SGL_LOG_INFO("Tcouch PRESSED: pos: %d, %d", x, y);
+            SGL_LOG_INFO("Touch PRESSED: pos: %d, %d", x, y);
         }
         else {
             dx = x - curr_pos.x;
@@ -418,7 +418,7 @@ void sgl_event_pos_input(int16_t x, int16_t y, bool flag)
                 curr_pos.x = x;
                 curr_pos.y = y;
                 sgl_event_send_pos(curr_pos, SGL_EVENT_MOTION);
-                SGL_LOG_INFO("Tcouch MOTION: pos: %d, %d", x, y);
+                SGL_LOG_INFO("Touch MOTION: pos: %d, %d", x, y);
             }
         }
     }
@@ -430,14 +430,14 @@ void sgl_event_pos_input(int16_t x, int16_t y, bool flag)
             if (sgl_square_sum(dx, dy) <= sgl_pow2(SGL_EVENT_MOVE_THRESHOLD)) {
                 if (tick - start_ms < SGL_EVENT_CLICK_INTERVAL) {
                     sgl_event_send_pos(first_pos, SGL_EVENT_CLICKED);
-                    SGL_LOG_INFO("Tcouch CLICKED: pos: %d, %d", first_pos.x, first_pos.y);
+                    SGL_LOG_INFO("Touch CLICKED: pos: %d, %d", first_pos.x, first_pos.y);
                 } else {
                     sgl_event_send_pos(first_pos, SGL_EVENT_LONG_CLICKED);
-                    SGL_LOG_INFO("Tcouch LONG_CLICKED: pos: %d, %d", first_pos.x, first_pos.y);
+                    SGL_LOG_INFO("Touch LONG_CLICKED: pos: %d, %d", first_pos.x, first_pos.y);
                 }
             }
             sgl_event_send_pos(curr_pos, SGL_EVENT_RELEASED);
-            SGL_LOG_INFO("Tcouch RELEASED: pos: %d, %d", curr_pos.x, curr_pos.y);
+            SGL_LOG_INFO("Touch RELEASED: pos: %d, %d", curr_pos.x, curr_pos.y);
         }
     }
 }
