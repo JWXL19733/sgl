@@ -1676,7 +1676,9 @@ static inline void draw_obj_slice(sgl_obj_t *obj, sgl_surf_t *surf)
     }
 
 #if (CONFIG_SGL_DIRTY_AREA_TRACE)
-    sgl_draw_wireframe(surf, (sgl_area_t*)surf, surf->dirty, 1, SGL_DIRTY_AREA_TRACE_COLOR, SGL_ALPHA_MAX);
+    if (sgl_system.fbdev.trace_flag) {
+        sgl_draw_wireframe(surf, (sgl_area_t*)surf, surf->dirty, 1, SGL_DIRTY_AREA_TRACE_COLOR, SGL_ALPHA_MAX);
+    }
 #endif
     /* flush dirty area into screen */
     sgl_fbdev_flush_area((sgl_area_t*)surf, surf->buffer);
@@ -1776,18 +1778,20 @@ static inline void sgl_dirty_area_harvest(sgl_obj_t *obj)
 /**
  * @brief sgl to draw complete frame
  * @param fbdev point to  frame buffer device
+ * @param dirty_area point to dirty area
+ * @param dirty_num dirty area number
  * @return none
  * @note this function should be called in deamon thread or cyclic thread
  */
-static inline void sgl_draw_task(sgl_fbdev_t *fbdev)
+static inline void sgl_draw_task(sgl_fbdev_t *fbdev, sgl_area_t *dirty_area, uint8_t dirty_num)
 {
     sgl_surf_t *surf = &fbdev->surf;
     sgl_obj_t  *head = fbdev->active;
     sgl_area_t *dirty = NULL;
 
     /* dirty area number must less than SGL_DIRTY_AREA_MAX */
-    for (uint8_t i = 0; i < fbdev->dirty_num; i++) {
-        dirty = &fbdev->dirty[i];
+    for (uint8_t i = 0; i < dirty_num; i++) {
+        dirty = &dirty_area[i];
         surf->dirty = dirty;
 
 #if (CONFIG_SGL_FBDEV_RUNTIME_ROTATION)
@@ -1833,8 +1837,6 @@ static inline void sgl_draw_task(sgl_fbdev_t *fbdev)
         draw_obj_slice(head, surf);
 #endif
     }
-    /* clear dirty area */
-    fbdev->dirty_num = 0;
 }
 
 
@@ -1860,8 +1862,25 @@ void sgl_task_handler_sync(void)
         sgl_system.fbdev.update_flag = 0;
     }
 
+#if (CONFIG_SGL_DIRTY_AREA_TRACE)
+    /* update trace dirty area */
+    if (sgl_system.fbdev.dirty_num) {
+        sgl_system.fbdev.trace_flag = false;
+        sgl_draw_task(&sgl_system.fbdev, sgl_system.fbdev.trace_dirty, sgl_system.fbdev.trace_dirty_num);
+
+        sgl_system.fbdev.trace_dirty_num = sgl_system.fbdev.dirty_num;
+        sgl_system.fbdev.trace_flag = true;
+
+        for (int i = 0; i < sgl_system.fbdev.dirty_num; i++) {
+            sgl_system.fbdev.trace_dirty[i] = sgl_system.fbdev.dirty[i];
+        }
+    }
+#endif
     /* draw all object into screen */
-    sgl_draw_task(&sgl_system.fbdev);
+    sgl_draw_task(&sgl_system.fbdev, sgl_system.fbdev.dirty, sgl_system.fbdev.dirty_num);
+
+    /* clear dirty area */
+    sgl_system.fbdev.dirty_num = 0;
 }
 
 

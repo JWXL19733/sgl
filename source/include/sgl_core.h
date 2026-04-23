@@ -500,6 +500,11 @@ typedef struct sgl_fbdev {
     volatile uint8_t  fb_status;
     sgl_area_t        dirty[SGL_DIRTY_AREA_NUM_MAX];
     sgl_obj_t         *active;
+#if (CONFIG_SGL_DIRTY_AREA_TRACE)
+    sgl_area_t        trace_dirty[SGL_DIRTY_AREA_NUM_MAX];
+    uint8_t           trace_dirty_num;
+    bool              trace_flag;
+#endif
 } sgl_fbdev_t;
 
 
