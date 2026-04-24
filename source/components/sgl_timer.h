@@ -42,7 +42,6 @@ typedef struct sgl_timer sgl_timer_t;
  */
 typedef void (*sgl_timer_callback_t)(const sgl_timer_t *timer, void *user_data);
 
-
 /**
  * @brief timer structure
  * @node: timer node for timer list
@@ -58,7 +57,8 @@ struct sgl_timer {
     void *user_data;
     int32_t count;
     uint16_t interval;
-    uint16_t last_tick;
+    uint16_t destroyed; 
+    uint32_t last_tick;
 };
 
 /**
@@ -70,9 +70,9 @@ sgl_timer_t* sgl_timer_create(void);
 /**
  * @brief delete a timer if your time is created dynamically
  * @param timer Pointer to the timer structure to be removed
- * @return 0 if successful, -1 if failed
+ * @return none
  */
-int sgl_timer_delete(sgl_timer_t *timer);
+void sgl_timer_delete(sgl_timer_t *timer);
 
 /**
  * @brief setup a timer
@@ -84,7 +84,7 @@ int sgl_timer_delete(sgl_timer_t *timer);
  * @return true if successful, false if failed
  * @note Timer will be inserted in ascending order by interval
  */
-bool sgl_timer_setup(sgl_timer_t *timer, sgl_timer_callback_t callback, uint32_t interval, int32_t repeat_cnt, void *user_data);
+bool sgl_timer_setup(sgl_timer_t *timer, sgl_timer_callback_t callback, uint16_t interval, int32_t repeat_cnt, void *user_data);
 
 /**
  * @brief Timer handler function, should be called periodically

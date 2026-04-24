@@ -24,6 +24,7 @@
 
 #include "sgl_timer.h"
 #include <sgl_mm.h>
+#include <string.h>
 
 static SGL_LIST_HEAD(sgl_timer_head);
 
@@ -42,19 +43,13 @@ sgl_timer_t* sgl_timer_create(void)
 /**
  * @brief delete a timer if your time is created dynamically
  * @param timer Pointer to the timer structure to be removed
- * @return 0 if successful, -1 if failed
+ * @return none
  */
-int sgl_timer_delete(sgl_timer_t *timer)
+void sgl_timer_delete(sgl_timer_t *timer)
 {
-    if (timer == NULL) {
-        return -1;
-    }
-
     if (timer->count != 0) {
-        sgl_list_del_node(&timer->node);
+        timer->destroyed = 1;
     }
-    sgl_free(timer);
-    return 0;
 }
 
 
@@ -68,7 +63,7 @@ int sgl_timer_delete(sgl_timer_t *timer)
  * @return true if successful, false if failed
  * @note Timer will be inserted in ascending order by interval
  */
-bool sgl_timer_setup(sgl_timer_t *timer, sgl_timer_callback_t callback, uint16_t interval, uint16_t repeat_cnt, void *user_data)
+bool sgl_timer_setup(sgl_timer_t *timer, sgl_timer_callback_t callback, uint16_t interval, int32_t repeat_cnt, void *user_data)
 {
     if (timer == NULL || callback == NULL || interval == 0) {
         return false;
@@ -112,6 +107,12 @@ void sgl_timer_handler(void)
 
         if (pos->count > 0) {
             pos->count--;
+        }
+
+        if (pos->destroyed) {
+            sgl_list_del_node(&pos->node);
+            sgl_free(pos);
+            continue;
         }
 
         if (pos->count == 0) {
