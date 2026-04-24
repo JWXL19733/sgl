@@ -49,6 +49,17 @@ typedef struct sgl_list_node {
 
 
 /**
+ * @brief container_of - cast a member of a structure out to the structure containing it
+ * @param ptr: the pointer to the member.
+ * @param type: the type of the container struct this is embedded in.
+ * @param member: the name of the member within the struct.
+ *
+ * @return type*: pointer to the containing structure
+ */
+#define sgl_list_entry(ptr, type, member)   sgl_container_of(ptr, type, member)
+
+
+/**
  * @brief foreach the list.
  *
  * @pos: the &struct list_head to use as a loop cursor.
@@ -58,6 +69,19 @@ typedef struct sgl_list_node {
  */
 #define sgl_list_for_each(pos, list_head) \
     for (pos = (list_head)->next; pos != (list_head); pos = pos->next)
+
+
+/**
+ * @brief safe foreach the list safety
+ *
+ * @pos: loop cursor
+ * @n: temp cursor to save next node
+ * @list_head: list head
+ *
+ * @return none
+ */
+#define sgl_list_for_each_safe(pos, n, list_head) \
+    for (pos = (list_head)->next, n = pos->next; pos != (list_head); pos = n, n = pos->next)
 
 
 /**

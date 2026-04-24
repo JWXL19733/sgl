@@ -1,10 +1,10 @@
-/* source/component/sgl_timer.c
+/* source/component/sgl_timer.h
  *
  * MIT License
  *
- * Copyright(c) 2023-present All contributors of SGL  
+ * Copyright(c) 2023-present All contributors of SGL
  * Document reference link: https://sgl-docs.readthedocs.io
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
@@ -27,7 +27,11 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include <sgl_core.h>
+#include "sgl_core.h"
+
+#define SGL_TIMER_SHORT_SLOT                  (128U)
+#define SGL_TIMER_LONG_SLOT                   (16U)
+#define SGL_TIMER_LONG_STEP                   (128U)
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,6 +41,7 @@ extern "C" {
  * @brief declare timer structure
  */
 typedef struct sgl_timer sgl_timer_t;
+
 /**
  * @brief declare timer callback function
  */
@@ -44,21 +49,17 @@ typedef void (*sgl_timer_callback_t)(const sgl_timer_t *timer, void *user_data);
 
 /**
  * @brief timer structure
- * @node: timer node for timer list
- * @callback: timer callback function
- * @user_data: user data
- * @interval: timer interval, ms
- * @count: timer repeat count
- * @last_tick: last tick
  */
 struct sgl_timer {
     sgl_list_node_t node;
     sgl_timer_callback_t callback;
-    void *user_data;
-    int32_t count;
+    void     *user_data;
+    int32_t  count;
     uint16_t interval;
-    uint16_t destroyed; 
+    uint8_t  destroyed;
+    uint8_t  wheel_type;
     uint32_t last_tick;
+    uint32_t wheel_pos;
 };
 
 /**
@@ -82,7 +83,6 @@ void sgl_timer_delete(sgl_timer_t *timer);
  * @param repeat_cnt Repeat count, -1 for infinite
  * @param user_data User data passed to callback function
  * @return true if successful, false if failed
- * @note Timer will be inserted in ascending order by interval
  */
 bool sgl_timer_setup(sgl_timer_t *timer, sgl_timer_callback_t callback, uint16_t interval, int32_t repeat_cnt, void *user_data);
 
