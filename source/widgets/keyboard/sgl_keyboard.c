@@ -535,6 +535,7 @@ sgl_obj_t* sgl_keyboard_create(sgl_obj_t* parent)
     obj->needinit  = 1;
 
     keyboard->body_desc.alpha = SGL_THEME_ALPHA;
+    keyboard->body_desc.border_alpha = SGL_THEME_ALPHA;
     keyboard->body_desc.color = SGL_THEME_COLOR;
     keyboard->body_desc.radius = SGL_THEME_RADIUS;
     keyboard->body_desc.border = 1;
@@ -577,6 +578,20 @@ void sgl_keyboard_set_color(sgl_obj_t *obj, sgl_color_t color)
  * @return none
  */
 void sgl_keyboard_set_alpha(sgl_obj_t *obj, uint8_t alpha)
+{
+    sgl_keyboard_t *keyboard = sgl_container_of(obj, sgl_keyboard_t, obj);
+    keyboard->body_desc.alpha = alpha;
+    keyboard->body_desc.border_alpha = alpha;
+    sgl_obj_set_dirty(obj);
+}
+
+/**
+ * @brief set keyboard main body alpha
+ * @param obj keyboard object
+ * @param alpha alpha [0 ~ 255]
+ * @return none
+ */
+void sgl_keyboard_set_main_alpha(sgl_obj_t *obj, uint8_t alpha)
 {
     sgl_keyboard_t *keyboard = sgl_container_of(obj, sgl_keyboard_t, obj);
     keyboard->body_desc.alpha = alpha;
@@ -639,6 +654,19 @@ void sgl_keyboard_set_border_width(sgl_obj_t *obj, uint8_t width)
 }
 
 /**
+ * @brief set keyboard border alpha
+ * @param obj keyboard object
+ * @param alpha border alpha [0 ~ 255]
+ * @return none
+ */
+void sgl_keyboard_set_border_alpha(sgl_obj_t *obj, uint8_t alpha)
+{
+    sgl_keyboard_t *keyboard = sgl_container_of(obj, sgl_keyboard_t, obj);
+    keyboard->btn_desc.border_alpha = alpha;
+    sgl_obj_set_dirty(obj);
+}
+
+/**
  * @brief set keyboard text color
  * @param obj keyboard object
  * @param color text color
@@ -684,6 +712,20 @@ void sgl_keyboard_set_btn_radius(sgl_obj_t *obj, uint8_t radius)
  * @return none
  */
 void sgl_keyboard_set_btn_alpha(sgl_obj_t *obj, uint8_t alpha)
+{
+    sgl_keyboard_t *keyboard = sgl_container_of(obj, sgl_keyboard_t, obj);
+    keyboard->btn_desc.alpha = alpha;
+    keyboard->btn_desc.border_alpha = alpha;
+    sgl_obj_set_dirty(obj);
+}
+
+/**
+ * @brief set keyboard button main alpha
+ * @param obj keyboard object
+ * @param alpha button alpha [0 ~ 255]
+ * @return none
+ */
+void sgl_keyboard_set_btn_main_alpha(sgl_obj_t *obj, uint8_t alpha)
 {
     sgl_keyboard_t *keyboard = sgl_container_of(obj, sgl_keyboard_t, obj);
     keyboard->btn_desc.alpha = alpha;
@@ -739,6 +781,19 @@ void sgl_keyboard_set_btn_border_width(sgl_obj_t *obj, uint8_t width)
 {
     sgl_keyboard_t *keyboard = sgl_container_of(obj, sgl_keyboard_t, obj);
     keyboard->btn_desc.border = width;
+    sgl_obj_set_dirty(obj);
+}
+
+/**
+ * @brief set keyboard button border alpha
+ * @param obj keyboard object
+ * @param alpha button border alpha [0 ~ 255]
+ * @return none
+ */
+void sgl_keyboard_set_btn_border_alpha(sgl_obj_t *obj, uint8_t alpha)
+{
+    sgl_keyboard_t *keyboard = sgl_container_of(obj, sgl_keyboard_t, obj);
+    keyboard->btn_desc.border_alpha = alpha;
     sgl_obj_set_dirty(obj);
 }
 

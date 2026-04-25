@@ -89,6 +89,7 @@ sgl_obj_t* sgl_progress_create(sgl_obj_t* parent)
     progress->body.alpha = SGL_THEME_ALPHA;
     progress->body.color = SGL_THEME_BG_COLOR;
     progress->body.border = SGL_THEME_BORDER_WIDTH;
+    progress->body.border_alpha = SGL_THEME_ALPHA;
     progress->body.border_color = SGL_THEME_BORDER_COLOR;
 
     progress->color = SGL_THEME_COLOR;
@@ -124,6 +125,7 @@ void sgl_progress_set_track_alpha(sgl_obj_t *obj, uint8_t alpha)
 {
     sgl_progress_t *progress = sgl_container_of(obj, sgl_progress_t, obj);
     progress->body.alpha = alpha;
+    progress->body.border_alpha = alpha;
     sgl_obj_set_dirty(obj);
 }
 

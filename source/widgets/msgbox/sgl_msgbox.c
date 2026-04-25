@@ -207,6 +207,7 @@ sgl_obj_t* sgl_msgbox_create(sgl_obj_t* parent)
     msgbox->body_desc.color = SGL_THEME_COLOR;
     msgbox->body_desc.radius = SGL_THEME_RADIUS;
     msgbox->body_desc.border = SGL_THEME_BORDER_WIDTH;
+    msgbox->body_desc.border_alpha = SGL_THEME_ALPHA;
     msgbox->body_desc.border_color = SGL_THEME_BORDER_COLOR;
     msgbox->body_desc.pixmap = NULL;
 
@@ -257,6 +258,33 @@ void sgl_msgbox_set_alpha(sgl_obj_t *obj, uint8_t alpha)
 {
     sgl_msgbox_t *msgbox = sgl_container_of(obj, sgl_msgbox_t, obj);
     msgbox->body_desc.alpha = alpha;
+    msgbox->body_desc.border_alpha = alpha;
+    sgl_obj_set_dirty(obj);
+}
+
+/**
+ * @brief set message box main body alpha
+ * @param obj message box object
+ * @param alpha message box main body alpha
+ * @return none
+ */
+void sgl_msgbox_set_main_alpha(sgl_obj_t *obj, uint8_t alpha)
+{
+    sgl_msgbox_t *msgbox = sgl_container_of(obj, sgl_msgbox_t, obj);
+    msgbox->body_desc.alpha = alpha;
+    sgl_obj_set_dirty(obj);
+}
+
+/**
+ * @brief set message box border alpha
+ * @param obj message box object
+ * @param alpha message box border alpha
+ * @return none
+ */
+void sgl_msgbox_set_border_alpha(sgl_obj_t *obj, uint8_t alpha)
+{
+    sgl_msgbox_t *msgbox = sgl_container_of(obj, sgl_msgbox_t, obj);
+    msgbox->body_desc.border_alpha = alpha;
     sgl_obj_set_dirty(obj);
 }
 

@@ -47,6 +47,7 @@ static void sgl_switch_construct_cb(sgl_surf_t *surf, sgl_obj_t* obj, sgl_event_
 
     sgl_draw_rect_t bg_desc = {
         .alpha = p_switch->alpha,
+        .border_alpha = p_switch->alpha,
         .border = obj->border,
         .color = p_switch->color,
         .border_color = p_switch->border_color,

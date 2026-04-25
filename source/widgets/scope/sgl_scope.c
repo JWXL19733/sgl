@@ -132,6 +132,7 @@ static void scope_construct_cb(sgl_surf_t *surf, sgl_obj_t* obj, sgl_event_t *ev
             .alpha = scope->alpha,
             .radius = 0,
             .border = scope->border_width,
+            .border_alpha = scope->alpha,
         };
 
         sgl_draw_rect(surf, &obj->area, &obj->coords, &bg_rect);

@@ -73,6 +73,14 @@ void sgl_rect_set_color(sgl_obj_t *obj, sgl_color_t color);
 void sgl_rect_set_alpha(sgl_obj_t *obj, uint8_t alpha);
 
 /**
+ * @brief  set rectangle main body alpha
+ * @param  obj: rectangle object
+ * @param  alpha: rectangle main body alpha
+ * @retval none
+ */
+void sgl_rect_set_main_alpha(sgl_obj_t *obj, uint8_t alpha);
+
+/**
  * @brief  set rectangle radius
  * @param  obj: rectangle object
  * @param  radius: rectangle radius

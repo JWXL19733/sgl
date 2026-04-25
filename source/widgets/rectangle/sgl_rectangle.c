@@ -127,6 +127,20 @@ void sgl_rect_set_alpha(sgl_obj_t *obj, uint8_t alpha)
 {
     sgl_rectangle_t *rect = sgl_container_of(obj, sgl_rectangle_t, obj);
     rect->alpha = alpha;
+    rect->border_alpha = alpha;
+    sgl_obj_set_dirty(obj);
+}
+
+/**
+ * @brief  set rectangle main body alpha
+ * @param  obj: rectangle object
+ * @param  alpha: rectangle main body alpha
+ * @retval none
+ */
+void sgl_rect_set_main_alpha(sgl_obj_t *obj, uint8_t alpha)
+{
+    sgl_rectangle_t *rect = sgl_container_of(obj, sgl_rectangle_t, obj);
+    rect->alpha = alpha;
     sgl_obj_set_dirty(obj);
 }
 

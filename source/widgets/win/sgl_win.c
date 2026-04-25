@@ -143,6 +143,7 @@ void sgl_win_set_alpha(sgl_obj_t *obj, uint8_t alpha)
 {
     sgl_win_t *win = sgl_container_of(obj, sgl_win_t, obj);
     win->bg.alpha = alpha;
+    win->bg.border_alpha = alpha;
     sgl_obj_set_dirty(obj);
 }
 

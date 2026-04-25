@@ -91,6 +91,22 @@ void sgl_msgbox_set_color(sgl_obj_t *obj, sgl_color_t color);
 void sgl_msgbox_set_alpha(sgl_obj_t *obj, uint8_t alpha);
 
 /**
+ * @brief set message box main body alpha
+ * @param obj message box object
+ * @param alpha message box main body alpha
+ * @return none
+ */
+void sgl_msgbox_set_main_alpha(sgl_obj_t *obj, uint8_t alpha);
+
+/**
+ * @brief set message box border alpha
+ * @param obj message box object
+ * @param alpha message box border alpha
+ * @return none
+ */
+void sgl_msgbox_set_border_alpha(sgl_obj_t *obj, uint8_t alpha);
+
+/**
  * @brief set message box radius
  * @param obj message box object
  * @param radius message box radius

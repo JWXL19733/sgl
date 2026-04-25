@@ -136,6 +136,7 @@ sgl_obj_t* sgl_textbox_create(sgl_obj_t* parent)
 
     textbox->bg.alpha = SGL_THEME_ALPHA;
     textbox->bg.color = SGL_THEME_COLOR;
+    textbox->bg.border_alpha = SGL_THEME_ALPHA;
     textbox->bg.radius = 10;
     textbox->bg.border = 1;
     textbox->bg.border_color = SGL_THEME_BORDER_COLOR;

@@ -79,6 +79,14 @@ void sgl_keyboard_set_color(sgl_obj_t *obj, sgl_color_t color);
 void sgl_keyboard_set_alpha(sgl_obj_t *obj, uint8_t alpha);
 
 /**
+ * @brief set keyboard main body alpha
+ * @param obj keyboard object
+ * @param alpha alpha [0 ~ 255]
+ * @return none
+ */
+void sgl_keyboard_set_main_alpha(sgl_obj_t *obj, uint8_t alpha);
+
+/**
  * @brief set keyboard radius
  * @param obj keyboard object
  * @param radius radius [0 ~ 255]
@@ -110,6 +118,14 @@ void sgl_keyboard_set_border_color(sgl_obj_t *obj, sgl_color_t color);
  * @return none
  */
 void sgl_keyboard_set_border_width(sgl_obj_t *obj, uint8_t width);
+
+/**
+ * @brief set keyboard border alpha
+ * @param obj keyboard object
+ * @param alpha border alpha [0 ~ 255]
+ * @return none
+ */
+void sgl_keyboard_set_border_alpha(sgl_obj_t *obj, uint8_t alpha);
 
 /**
  * @brief set keyboard text color
@@ -144,6 +160,14 @@ void sgl_keyboard_set_btn_radius(sgl_obj_t *obj, uint8_t radius);
 void sgl_keyboard_set_btn_alpha(sgl_obj_t *obj, uint8_t alpha);
 
 /**
+ * @brief set keyboard button main alpha
+ * @param obj keyboard object
+ * @param alpha button alpha [0 ~ 255]
+ * @return none
+ */
+void sgl_keyboard_set_btn_main_alpha(sgl_obj_t *obj, uint8_t alpha);
+
+/**
  * @brief set keyboard button color
  * @param obj keyboard object
  * @param color button color
@@ -174,6 +198,14 @@ void sgl_keyboard_set_btn_border_color(sgl_obj_t *obj, sgl_color_t color);
  * @return none
  */
 void sgl_keyboard_set_btn_border_width(sgl_obj_t *obj, uint8_t width);
+
+/**
+ * @brief set keyboard button border alpha
+ * @param obj keyboard object
+ * @param alpha button border alpha [0 ~ 255]
+ * @return none
+ */
+void sgl_keyboard_set_btn_border_alpha(sgl_obj_t *obj, uint8_t alpha);
 
 /**
  * @brief get keyboard opcode
