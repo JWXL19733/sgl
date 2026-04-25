@@ -40,36 +40,34 @@ static void sgl_bar_construct_cb(sgl_surf_t *surf, sgl_obj_t* obj, sgl_event_t *
     sgl_draw_rect_t desc = {
         .alpha = bar->alpha,
         .border = obj->border,
+        .border_alpha = bar->alpha,
         .border_color = bar->border_color,
         .pixmap = bar->pixmap,
         .color = bar->track_color,
         .radius = obj->radius,
     };
 
-    sgl_area_t knob = {
-        .x1 = obj->coords.x1 + obj->border,
-        .x2 = obj->coords.x2 - obj->border,
-        .y1 = obj->coords.y1 + obj->border,
-        .y2 = obj->coords.y2 - obj->border,
-    };
+    sgl_area_t desc_area = obj->area;
+    int knob_pos = 0;
 
     if(evt->type == SGL_EVENT_DRAW_MAIN) {
         if(bar->direct == SGL_DIRECT_HORIZONTAL) {
-            knob.x2 = obj->coords.x1 + (obj->coords.x2 - obj->coords.x1) * bar->value / 100 - obj->border;
+            knob_pos = obj->coords.x1 + (obj->coords.x2 - obj->coords.x1) * bar->value / 100 - obj->border;
+            desc_area.x2 = knob_pos;
+            sgl_draw_rect(surf, &desc_area, &obj->coords, &desc);
+            desc_area.x1 = knob_pos;
+            desc_area.x2 = obj->area.x2;
+            desc.color = bar->fill_color;
+            sgl_draw_rect(surf, &desc_area, &obj->coords, &desc);
         }
         else {
-            knob.y1 = obj->coords.y2 - (obj->coords.y2 - obj->coords.y1) * bar->value / 100 + obj->border;
-        }
-
-        /* set knob area */
-        sgl_area_selfclip(&knob, &obj->area);
-
-        sgl_draw_rect(surf, &obj->area, &obj->coords, &desc);
-        if (obj->border) {
-            sgl_draw_fill_rect_with_border(surf, &knob, &obj->coords, obj->radius, bar->fill_color, bar->border_color, obj->border, bar->alpha, bar->alpha);
-        }
-        else {
-            sgl_draw_fill_rect(surf, &knob, &obj->coords, obj->radius, bar->fill_color, bar->alpha);
+            knob_pos = obj->coords.y2 - (obj->coords.y2 - obj->coords.y1) * bar->value / 100 + obj->border;
+            desc_area.y2 = knob_pos;
+            sgl_draw_rect(surf, &desc_area, &obj->coords, &desc);
+            desc_area.y1 = knob_pos;
+            desc_area.y2 = obj->area.y2;
+            desc.color = bar->fill_color;
+            sgl_draw_rect(surf, &desc_area, &obj->coords, &desc);
         }
     }
     else if(evt->type == SGL_EVENT_PRESSED ||
