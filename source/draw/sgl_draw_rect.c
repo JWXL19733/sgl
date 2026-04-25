@@ -200,10 +200,10 @@ void sgl_draw_fill_rect_border(sgl_surf_t *surf, sgl_area_t *area, sgl_area_t *r
         for (int y = clip.y1; y <= clip.y2; y++) {
             blend = buf;
             for (int x = clip.x1; x < cx1i; x++, blend++) {
-                *blend = (alpha == SGL_ALPHA_MAX) ? border_color : sgl_color_mixer(border_color, *blend, alpha);
+               *blend = (alpha == SGL_ALPHA_MAX) ? border_color : sgl_color_mixer(border_color, *blend, alpha);
             }
             blend += skip_i;
-            for (int x = cx2i; x <= clip.x2; x++, blend++) {
+            for (int x = (cx2i + 1); x <= clip.x2; x++, blend++) {
                 *blend = (alpha == SGL_ALPHA_MAX) ? border_color : sgl_color_mixer(border_color, *blend, alpha);
             }
             buf += surf->w;
