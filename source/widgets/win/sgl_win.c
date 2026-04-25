@@ -28,27 +28,31 @@
 static void sgl_win_construct_cb(sgl_surf_t *surf, sgl_obj_t* obj, sgl_event_t *evt)
 {
     sgl_win_t *win = sgl_container_of(obj, sgl_win_t, obj);
-    sgl_rect_t bg = obj->coords;
-    sgl_rect_t title_bg = obj->coords;
+    sgl_rect_t title_area = obj->area;
+    sgl_rect_t body_area = obj->area;
+    sgl_draw_rect_t desc = win->bg;
     sgl_pos_t align_pos;
     int16_t close_cx, close_cy, close_r, title_h;
 
-    win->title_h = sgl_max3(obj->radius, win->title_h, sgl_font_get_height(win->title_font));
-    title_h = win->title_h;
-    //bg.y1 -= title_h;
-    title_bg.y1 = bg.y1;
-    title_bg.y2 = title_bg.y1 + title_h;
+    title_h = sgl_max3(obj->radius, win->title_h, sgl_font_get_height(win->title_font));
     close_r  = title_h / 3;
-    close_cx = obj->coords.x2 - close_r - obj->radius / 2;
-    close_cy = title_bg.y1 + title_h / 2 + obj->border / 2;
+    close_cx = (obj->coords.x2 - obj->border - title_h / 2);
+    close_cy = obj->coords.y1 + title_h / 2 + obj->border / 2;
 
     if (evt->type == SGL_EVENT_DRAW_MAIN) {
-        sgl_draw_rect(surf, &obj->area, &bg, &win->bg);
-        sgl_draw_fill_rect_with_border(surf, &title_bg, &bg, obj->radius, win->title_bg_color, 
-                                             win->bg.border_color, win->bg.border, win->bg.alpha, win->bg.alpha
-                                      );
+        title_area.y2 = title_area.y1 + title_h;
+        body_area.y1 = title_area.y2;
+        desc.color = win->bg.color;
+        sgl_draw_rect(surf, &body_area, &obj->coords, &desc);
 
-        align_pos = sgl_get_text_pos(&title_bg, win->title_font, win->title_text, 0, (sgl_align_type_t)win->title_align);
+        desc.color = win->title_bg_color;
+        desc.alpha = win->bg.alpha;
+        desc.pixmap = NULL;
+        sgl_draw_rect(surf, &title_area, &obj->coords, &desc);
+
+        title_area.x1 += obj->border;
+        title_area.x2 -= obj->border;
+        align_pos = sgl_get_text_pos(&title_area, win->title_font, win->title_text, 0, (sgl_align_type_t)win->title_align);
         if (win->title_align == SGL_ALIGN_LEFT_MID) {
             align_pos.x += obj->radius;
         }
@@ -56,7 +60,7 @@ static void sgl_win_construct_cb(sgl_surf_t *surf, sgl_obj_t* obj, sgl_event_t *
                           win->title_text_color, win->bg.alpha, win->title_font
                         );
         
-        sgl_draw_fill_circle(surf, &title_bg, close_cx, close_cy, close_r, win->close_color, win->bg.alpha);
+        sgl_draw_fill_circle(surf, &title_area, close_cx, close_cy, close_r, win->close_color, win->bg.alpha);
     }
     else if (evt->type == SGL_EVENT_PRESSED || evt->type == SGL_EVENT_CLICKED) {
         if (evt->pos.x >= (close_cx - close_r) && evt->pos.x <= (close_cx + close_r) 
@@ -92,6 +96,7 @@ sgl_obj_t* sgl_win_create(sgl_obj_t* parent)
     win->bg.radius = SGL_THEME_RADIUS;
     win->bg.border = 0;
     win->bg.border_color = SGL_THEME_BORDER_COLOR;
+    win->bg.border_alpha = SGL_THEME_ALPHA;
 
     win->title_align = SGL_ALIGN_LEFT_MID;
     win->title_bg_color = sgl_color_mixer(SGL_THEME_COLOR, SGL_THEME_BG_COLOR, 128);
