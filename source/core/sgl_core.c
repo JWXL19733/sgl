@@ -1885,8 +1885,8 @@ void sgl_task_handler_sync(void)
     /* draw all object into screen */
     sgl_draw_task(&sgl_system.fbdev, sgl_system.fbdev.dirty, sgl_system.fbdev.dirty_num);
 
-    /* clear dirty area */
-    sgl_system.fbdev.dirty_num = 0;
+    /* clear dirty area and fullscreen flag */
+    sgl_system.fbdev.dirty_num = sgl_system.fbdev.full_dirty = 0;
 }
 
 
