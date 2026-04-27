@@ -43,7 +43,7 @@ static void sgl_bar_construct_cb(sgl_surf_t *surf, sgl_obj_t* obj, sgl_event_t *
         .border_alpha = bar->alpha,
         .border_color = bar->border_color,
         .pixmap = bar->pixmap,
-        .color = bar->track_color,
+        .color = bar->fill_color,
         .radius = obj->radius,
     };
 
@@ -52,21 +52,21 @@ static void sgl_bar_construct_cb(sgl_surf_t *surf, sgl_obj_t* obj, sgl_event_t *
 
     if(evt->type == SGL_EVENT_DRAW_MAIN) {
         if(bar->direct == SGL_DIRECT_HORIZONTAL) {
-            knob_pos = obj->coords.x1 + (obj->coords.x2 - obj->coords.x1) * bar->value / 100 - obj->border;
+            knob_pos = obj->coords.x1 + (obj->coords.x2 - obj->coords.x1 + 1) * bar->value / 100 - obj->border;
             desc_area.x2 = knob_pos;
             sgl_draw_rect(surf, &desc_area, &obj->coords, &desc);
             desc_area.x1 = knob_pos;
             desc_area.x2 = obj->area.x2;
-            desc.color = bar->fill_color;
+            desc.color = bar->track_color;
             sgl_draw_rect(surf, &desc_area, &obj->coords, &desc);
         }
         else {
-            knob_pos = obj->coords.y2 - (obj->coords.y2 - obj->coords.y1) * bar->value / 100 + obj->border;
-            desc_area.y2 = knob_pos;
-            sgl_draw_rect(surf, &desc_area, &obj->coords, &desc);
+            knob_pos = obj->coords.y2 - (obj->coords.y2 - obj->coords.y1 + 1) * bar->value / 100 + obj->border;
             desc_area.y1 = knob_pos;
-            desc_area.y2 = obj->area.y2;
-            desc.color = bar->fill_color;
+            sgl_draw_rect(surf, &desc_area, &obj->coords, &desc);
+            desc_area.y2 = knob_pos;
+            desc_area.y1 = obj->area.y1;
+            desc.color = bar->track_color;
             sgl_draw_rect(surf, &desc_area, &obj->coords, &desc);
         }
     }
@@ -74,10 +74,10 @@ static void sgl_bar_construct_cb(sgl_surf_t *surf, sgl_obj_t* obj, sgl_event_t *
         evt->type == SGL_EVENT_MOVE_DOWN || evt->type == SGL_EVENT_MOVE_UP || evt->type == SGL_EVENT_MOVE_LEFT || evt->type == SGL_EVENT_MOVE_RIGHT
     ) {
         if(bar->direct == SGL_DIRECT_HORIZONTAL) {
-            bar->value = (evt->pos.x - obj->coords.x1) * 100 / (obj->coords.x2 - obj->coords.x1);
+            bar->value = (evt->pos.x - obj->coords.x1 + 1) * 100 / (obj->coords.x2 - obj->coords.x1 + 1);
         }
         else {
-            bar->value = (obj->coords.y2 - evt->pos.y) * 100 / (obj->coords.y2 - obj->coords.y1);
+            bar->value = (obj->coords.y2 - evt->pos.y + 1) * 100 / (obj->coords.y2 - obj->coords.y1 + 1);
         }
 
         if(evt->type == SGL_EVENT_PRESSED) {
