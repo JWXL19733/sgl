@@ -40,6 +40,7 @@ static void sgl_slider_construct_cb(sgl_surf_t *surf, sgl_obj_t* obj, sgl_event_
     int16_t h = obj->coords.y2 - obj->coords.y1 + 1;
     int16_t knob_r, fill_pos, thickness, radius;
     sgl_rect_t bar;
+    sgl_area_t desc_area = obj->area;
 
     if(evt->type == SGL_EVENT_DRAW_MAIN) {
         if(slider->direct == SGL_DIRECT_HORIZONTAL) {
@@ -49,13 +50,16 @@ static void sgl_slider_construct_cb(sgl_surf_t *surf, sgl_obj_t* obj, sgl_event_
             bar.x2 = obj->coords.x2 - knob_r;
             bar.y1 = obj->coords.y1 + (h - thickness) / 2;
             bar.y2 = bar.y1 + thickness - 1;
-            fill_pos = obj->coords.x1 + (obj->coords.x2 - obj->coords.x1) * slider->value / 100 - obj->border;
-    
-            radius = sgl_min(thickness / 2, obj->radius);
-            sgl_draw_fill_rect(surf, &obj->area, &bar, radius, slider->track_color, SGL_ALPHA_MAX);
+            fill_pos = obj->coords.x1 + (w) * slider->value / 100 - obj->border;
             fill_pos = sgl_clamp(fill_pos, bar.x1, bar.x2);
-            bar.x2 = fill_pos;
-            sgl_draw_fill_rect(surf, &obj->area, &bar, radius, slider->fill_color, SGL_ALPHA_MAX);
+            desc_area.x1 = bar.x1;
+            desc_area.x2 = fill_pos;
+
+            radius = sgl_min(thickness / 2, obj->radius);
+            sgl_draw_fill_rect(surf, &desc_area, &bar, radius, slider->fill_color, SGL_ALPHA_MAX);
+            desc_area.x1 = fill_pos;
+            desc_area.x2 = bar.x2;
+            sgl_draw_fill_rect(surf, &desc_area, &bar, radius, slider->track_color, SGL_ALPHA_MAX);
             sgl_draw_fill_circle(surf, &obj->area, fill_pos, sgl_mid(bar.y1, bar.y2), knob_r, slider->knob_color, SGL_ALPHA_MAX);
         }
         else {
@@ -63,15 +67,18 @@ static void sgl_slider_construct_cb(sgl_surf_t *surf, sgl_obj_t* obj, sgl_event_
             thickness = sgl_min(slider->thickness, knob_r);
             bar.y1 = obj->coords.y1 + knob_r;
             bar.y2 = obj->coords.y2 - knob_r;
-            bar.x2 = obj->coords.x2 - (w - thickness) / 2;
-            bar.x1 = bar.x2 - thickness + 1;
-            fill_pos = obj->coords.y2 - (obj->coords.y2 - obj->coords.y1) * slider->value / 100 + obj->border;
+            bar.x1 = obj->coords.x1 + (w - thickness) / 2;
+            bar.x2 = bar.x1 + thickness - 1;
+            fill_pos = obj->coords.y2 - (h) * slider->value / 100 + obj->border;
+            fill_pos = sgl_clamp(fill_pos, bar.y1, bar.y2);
+            desc_area.y2 = bar.y2;
+            desc_area.y1 = fill_pos;
 
             radius = sgl_min(thickness / 2, obj->radius);
-            sgl_draw_fill_rect(surf, &obj->area, &bar, radius, slider->track_color, SGL_ALPHA_MAX);
-            fill_pos = sgl_clamp(fill_pos, bar.y1, bar.y2);
-            bar.y1 = fill_pos;
-            sgl_draw_fill_rect(surf, &obj->area, &bar, radius, slider->fill_color, SGL_ALPHA_MAX);
+            sgl_draw_fill_rect(surf, &desc_area, &bar, radius, slider->fill_color, SGL_ALPHA_MAX);
+            desc_area.y2 = fill_pos;
+            desc_area.y1 = bar.y1;
+            sgl_draw_fill_rect(surf, &desc_area, &bar, radius, slider->track_color, SGL_ALPHA_MAX);
             sgl_draw_fill_circle(surf, &obj->area, sgl_mid(bar.x1, bar.x2), fill_pos, knob_r, slider->knob_color, SGL_ALPHA_MAX);
         }
     }
