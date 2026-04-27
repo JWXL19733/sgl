@@ -52,13 +52,13 @@ static void sgl_slider_construct_cb(sgl_surf_t *surf, sgl_obj_t* obj, sgl_event_
             bar.y2 = bar.y1 + thickness - 1;
             fill_pos = obj->coords.x1 + (w) * slider->value / 100 - obj->border;
             fill_pos = sgl_clamp(fill_pos, bar.x1, bar.x2);
-            desc_area.x1 = bar.x1;
-            desc_area.x2 = fill_pos;
+            desc_area.x1 = sgl_max(bar.x1, obj->area.x1);
+            desc_area.x2 = sgl_min(fill_pos, obj->area.x2);
 
             radius = sgl_min(thickness / 2, obj->radius);
             sgl_draw_fill_rect(surf, &desc_area, &bar, radius, slider->fill_color, SGL_ALPHA_MAX);
-            desc_area.x1 = fill_pos;
-            desc_area.x2 = bar.x2;
+            desc_area.x1 = sgl_max(fill_pos, obj->area.x1);
+            desc_area.x2 = sgl_min(bar.x2, obj->area.x2);
             sgl_draw_fill_rect(surf, &desc_area, &bar, radius, slider->track_color, SGL_ALPHA_MAX);
             sgl_draw_fill_circle(surf, &obj->area, fill_pos, sgl_mid(bar.y1, bar.y2), knob_r, slider->knob_color, SGL_ALPHA_MAX);
         }
@@ -71,13 +71,13 @@ static void sgl_slider_construct_cb(sgl_surf_t *surf, sgl_obj_t* obj, sgl_event_
             bar.x2 = bar.x1 + thickness - 1;
             fill_pos = obj->coords.y2 - (h) * slider->value / 100 + obj->border;
             fill_pos = sgl_clamp(fill_pos, bar.y1, bar.y2);
-            desc_area.y2 = bar.y2;
-            desc_area.y1 = fill_pos;
+            desc_area.y2 = sgl_min(bar.y2, obj->area.y2);
+            desc_area.y1 = sgl_max(fill_pos, obj->area.y1);
 
             radius = sgl_min(thickness / 2, obj->radius);
             sgl_draw_fill_rect(surf, &desc_area, &bar, radius, slider->fill_color, SGL_ALPHA_MAX);
-            desc_area.y2 = fill_pos;
-            desc_area.y1 = bar.y1;
+            desc_area.y2 = sgl_min(fill_pos, obj->area.y2);
+            desc_area.y1 = sgl_max(bar.y1, obj->area.y1);
             sgl_draw_fill_rect(surf, &desc_area, &bar, radius, slider->track_color, SGL_ALPHA_MAX);
             sgl_draw_fill_circle(surf, &obj->area, sgl_mid(bar.x1, bar.x2), fill_pos, knob_r, slider->knob_color, SGL_ALPHA_MAX);
         }

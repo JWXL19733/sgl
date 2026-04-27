@@ -53,18 +53,18 @@ static void sgl_bar_construct_cb(sgl_surf_t *surf, sgl_obj_t* obj, sgl_event_t *
     if(evt->type == SGL_EVENT_DRAW_MAIN) {
         if(bar->direct == SGL_DIRECT_HORIZONTAL) {
             knob_pos = obj->coords.x1 + (obj->coords.x2 - obj->coords.x1 + 1) * bar->value / 100 - obj->border;
-            desc_area.x2 = knob_pos;
+            desc_area.x2 = sgl_min(knob_pos, obj->area.x2);
             sgl_draw_rect(surf, &desc_area, &obj->coords, &desc);
-            desc_area.x1 = knob_pos;
+            desc_area.x1 = sgl_max(knob_pos, obj->area.x1);
             desc_area.x2 = obj->area.x2;
             desc.color = bar->track_color;
             sgl_draw_rect(surf, &desc_area, &obj->coords, &desc);
         }
         else {
             knob_pos = obj->coords.y2 - (obj->coords.y2 - obj->coords.y1 + 1) * bar->value / 100 + obj->border;
-            desc_area.y1 = knob_pos;
+            desc_area.y1 = sgl_max(knob_pos, obj->area.y1);
             sgl_draw_rect(surf, &desc_area, &obj->coords, &desc);
-            desc_area.y2 = knob_pos;
+            desc_area.y2 = sgl_min(knob_pos, obj->area.y2);
             desc_area.y1 = obj->area.y1;
             desc.color = bar->track_color;
             sgl_draw_rect(surf, &desc_area, &obj->coords, &desc);
