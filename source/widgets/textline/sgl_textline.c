@@ -46,6 +46,7 @@ static void sgl_textline_construct_cb(sgl_surf_t *surf, sgl_obj_t* obj, sgl_even
         text_area.x2 = obj->coords.x2 - obj->radius;
         text_area.y1 = obj->coords.y1 + obj->radius;
         text_area.y2 = obj->coords.y2 - obj->radius;
+        sgl_area_selfclip(&text_area, &obj->area);
 
         if (textline->bg_flag) {
             sgl_draw_fill_rect(surf, &obj->area, &obj->coords, obj->radius, textline->bg_color, textline->alpha);
